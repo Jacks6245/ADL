@@ -1,19 +1,35 @@
 package com.example.jackskitt.adlarcherydatalogger.Sensors;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothManager;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
-import javax.swing.JLabel;
-
-import jssc.SerialPort;
-import jssc.SerialPortException;
-import jssc.SerialPortList;
-import jssc.SerialPortTimeoutException;
-import main.Logger;
-import main.QuatGrapher;
 
 public class SensorStore {
+
+
+    //these are the UDIDs used by the firmware
+    public final static UUID DEVICE_INFORMATION_SERVICE_UUID = UUID.fromString("0000180A-0000-1000-8000-00805F9B43FB");
+    public final static UUID MANUFACTURER_NAME_UUID = UUID.fromString("00002A00-0000-1000-8000-00805F9B43FB");
+
+    public final static UUID BATTERY_SERVICE_UUID = UUID.fromString("0000180F-0000-1000-8000-00805F9B43FB");
+    public final static UUID BATTERY_LEVEL_UUID = UUID.fromString("00002A19-0000-1000-8000-00805F9B43FB");
+
+    public final static UUID NRF_UART_SERVICE_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
+    public final static UUID NRF_UART_RX_UUID = UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"); //write without response
+    public final static UUID NRF_UART_TX_UUID = UUID.fromString("6E400003-B5A3-F393-E0A9-E50E24DCCA9E"); //notify
+
+    public final static UUID DFU_SERVICE = UUID.fromString("00001530-1212-EFDE-1523-785FEABCD123");
+
+    //universal for Notify or Indicate types of characteristics
+    public final static UUID CLIENT_CHARACTERISTIC_CONFIGURATION_DESCRIPTOR = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
+
     // open accessibility for tests
     public List<Sensor> sensorStorage = new ArrayList<Sensor>();
     public List<String> outgoingPorts = new ArrayList<String>();
@@ -26,7 +42,16 @@ public class SensorStore {
 
     private static SensorStore instance;
 
-    private String usbPortName = "COM6";
+    public BluetoothManager mBluetoothManager;
+    public BluetoothAdapter mBluetoothAdapter;
+
+
+    public static SensorStore getInstance() {
+        if (instance == null) {
+            instance = new SensorStore();
+        }
+        return instance;
+    }
 
     public SensorStore() {
         // perform an initial search
@@ -38,7 +63,7 @@ public class SensorStore {
         for (Sensor sensor : sensorStorage) {
             if (sensor != null) {
                 sensor.collectData = false;
-                sensor.closePort();
+                sensor.close();
             }
         }
 
@@ -54,27 +79,6 @@ public class SensorStore {
         }
     }
 
-    // Loops through all the sensors and connects to them while increasing the
-    // number of sensors for error checking
-    private boolean connectSensors() {
-        for (String outPorts : outgoingPorts) {
-            Sensor tempSensor = new Sensor();
-            tempSensor.collectData = true;
-            if (tempSensor.connectToPort(outPorts)) {
-                numSensors++;
-
-                tempSensor.id = numSensors;
-                sensorStorage.add(tempSensor);
-                QuatGrapher.getInstance().chart.addNewDrawingCanvas(tempSensor);
-                return true;
-            } else {
-                System.out.println("ERROR: Sensor cannot be added.");
-                return false;
-            }
-        }
-        return false;
-    }
-
     public Sensor getSensorByName(String name) {
         for (Sensor s : sensorStorage) {
 
@@ -88,14 +92,13 @@ public class SensorStore {
     public boolean connectToSensor(String sensor) {
         Sensor tempSensor = new Sensor();
         tempSensor.collectData = true;
-        if (tempSensor.connectToPort(sensor)) {
+        if (tempSensor.connect(sensor)) {
 
 
             tempSensor.id = numSensors;
             sensorStorage.add(tempSensor);
-
-            Logger.getInstance().addConnectedSensor(sensor);
             numSensors++;
+
             return true;
         } else {
             System.out.println("ERROR: Sensor cannot be added.");
@@ -108,30 +111,7 @@ public class SensorStore {
     // assumption that the only things connected to the com ports are the
     // sensors
     public void findOutgoingPorts() {
-        List<String> portNames = new ArrayList<String>(Arrays.asList(SerialPortList.getPortNames()));
 
-        if (!portNames.contains(usbPortName)) {
-            portNames.add(usbPortName);
-        }
-
-        for (String port : portNames) {
-            try {
-                SerialPort serialPort = new SerialPort(port);
-                serialPort.openPort();// Open serial port
-
-                serialPort.setParams(57600, 8, 1, 0, true, false);
-
-                if (!serialPort.isDSR() && !(port.equals(usbPortName))) {
-                    serialPort.closePort();
-                    continue;
-                }
-                outgoingPorts.add(port);
-                hasSensors = true;
-                serialPort.closePort();
-            } catch (SerialPortException e) {
-                System.out.println(e.getMessage());
-            }
-        }
     }
 
     public void clearLog() {
@@ -142,11 +122,31 @@ public class SensorStore {
         }
     }
 
-    public static SensorStore getInstance() {
-        if (instance == null) {
-            instance = new SensorStore();
-        }
-        return instance;
+    public static boolean isDeviceInformationService(final BluetoothGattService service) {
+        return service != null && SensorStore.getInstance().DEVICE_INFORMATION_SERVICE_UUID.equals(service.getUuid());
     }
 
+    public static boolean isManufacturerNameCharacteristic(final BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && SensorStore.getInstance().MANUFACTURER_NAME_UUID.equals(characteristic.getUuid());
+    }
+
+    public static boolean isBatteryService(final BluetoothGattService service) {
+        return service != null && SensorStore.getInstance().BATTERY_SERVICE_UUID.equals(service.getUuid());
+    }
+
+    public static boolean isBatteryLevelCharacteristic(final BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && SensorStore.getInstance().BATTERY_LEVEL_UUID.equals(characteristic.getUuid());
+    }
+
+    public static boolean isNRFUartService(final BluetoothGattService service) {
+        return service != null && SensorStore.getInstance().NRF_UART_SERVICE_UUID.equals(service.getUuid());
+    }
+
+    public static boolean isNRFUartWriteCharacteristic(final BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && SensorStore.getInstance().NRF_UART_RX_UUID.equals(characteristic.getUuid());
+    }
+
+    public static boolean isNRFUartReadCharacteristic(final BluetoothGattCharacteristic characteristic) {
+        return characteristic != null && SensorStore.getInstance().NRF_UART_TX_UUID.equals(characteristic.getUuid());
+    }
 }

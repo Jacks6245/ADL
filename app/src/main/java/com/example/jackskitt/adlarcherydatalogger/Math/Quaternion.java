@@ -1,11 +1,11 @@
 package com.example.jackskitt.adlarcherydatalogger.Math;
 
-import java.awt.Color;
+import android.graphics.Color;
 
 import javax.vecmath.Quat4d;
 
 public class Quaternion extends Quat4d {
-    public static Color[] colours = {Color.GREEN, Color.RED, Color.WHITE, Color.BLUE};
+    public static int[] colours = {Color.GREEN, Color.RED, Color.WHITE, Color.BLUE};
 
     public Quaternion(double w, double x, double y, double z) {
         // TODO Auto-generated constructor stub

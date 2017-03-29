@@ -2,11 +2,11 @@ package com.example.jackskitt.adlarcherydatalogger.Sensors;
 
 import java.util.ArrayList;
 
-import Collection.Sample;
-import Math.MathHelper;
-import Math.Vector3;
-import Sensors.*;
-import main.*;
+import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
+import com.example.jackskitt.adlarcherydatalogger.Math.MathHelper;
+import com.example.jackskitt.adlarcherydatalogger.Math.Vector3;
+import com.example.jackskitt.adlarcherydatalogger.Sensors.*;
+import com.example.jackskitt.adlarcherydatalogger.Math.Averager;
 
 public class SensorCollector {
 ///this class mainly deals with the calibration and graphing storage, storing averagers...

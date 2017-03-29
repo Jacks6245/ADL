@@ -1,7 +1,7 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
-import Sensors.Sensor;
-import Sensors.SensorStore;
+import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
+import com.example.jackskitt.adlarcherydatalogger.Sensors.SensorStore;
 
 import java.io.*;
 import java.text.SimpleDateFormat;

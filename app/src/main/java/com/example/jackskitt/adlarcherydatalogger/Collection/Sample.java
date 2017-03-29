@@ -1,9 +1,8 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
-import Sensors.*;
-import main.*;
-import sun.util.resources.cldr.aa.CalendarData_aa_ER;
-import Math.*;
+import com.example.jackskitt.adlarcherydatalogger.Sensors.*;
+
+import com.example.jackskitt.adlarcherydatalogger.Math.*;
 
 import java.math.*;
 import java.sql.Date;

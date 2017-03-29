@@ -2,7 +2,8 @@ package com.example.jackskitt.adlarcherydatalogger.Collection;
 
 import java.util.ArrayList;
 
-import Sensors.Sensor;
+import com.example.jackskitt.adlarcherydatalogger.Math.Averager;
+import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
 
 public class SampleStorage {
 

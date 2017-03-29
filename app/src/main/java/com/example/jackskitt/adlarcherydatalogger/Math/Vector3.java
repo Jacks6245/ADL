@@ -2,7 +2,7 @@ package com.example.jackskitt.adlarcherydatalogger.Math;
 
 import javax.vecmath.Quat4d;
 
-import java.awt.Color;
+import android.graphics.Color;
 
 import javax.vecmath.Point3d;
 
@@ -10,7 +10,7 @@ public class Vector3 extends Point3d {
 
     public float magnitude;
 
-    public static Color[] colours = {Color.RED, Color.WHITE, Color.BLUE};
+    public static int[] colours = {Color.rgb(255, 0, 0), Color.rgb(0, 255, 0), Color.rgb(0, 0, 255)};
 
     public Vector3(double x, double y, double z) {
         this.x = x;
