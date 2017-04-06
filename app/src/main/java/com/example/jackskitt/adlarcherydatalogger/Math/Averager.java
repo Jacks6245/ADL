@@ -52,7 +52,6 @@ public class Averager {
     public Sample sampleVariation() {
         Sample min = samples[0];
         Sample max = samples[0];
-        ;
 
         for (int i = 0; i < nSamples; i++) {
             if (Sample.greaterThan(samples[i], max)) {
@@ -94,9 +93,7 @@ public class Averager {
         }
 
         lastAverage.Zero();
-        ;
         currentAverage.Zero();
-        ;
     }
 
     /**

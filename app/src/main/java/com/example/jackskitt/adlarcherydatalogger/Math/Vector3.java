@@ -31,7 +31,7 @@ public class Vector3 extends Point3d {
     }
 
     private void magnitude() {
-        magnitude = (float) Math.sqrt((double) ((this.x * this.x) + (this.y * this.y) + (this.z * this.z)));
+        magnitude = (float) Math.sqrt((this.x * this.x) + (this.y * this.y) + (this.z * this.z));
 
     }
 

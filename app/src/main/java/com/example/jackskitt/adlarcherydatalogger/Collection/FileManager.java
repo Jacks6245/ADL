@@ -6,7 +6,7 @@ import com.example.jackskitt.adlarcherydatalogger.Sensors.SensorStore;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;;
+import java.util.Date;
 
 public class FileManager {
     //TODO:  update this for android

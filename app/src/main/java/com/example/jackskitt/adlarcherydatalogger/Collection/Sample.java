@@ -20,10 +20,13 @@ public class Sample {
 
     public Quaternion quat;
 
-    public Sample(Vector3 acceleration, Quaternion quaternion) {
+    public Vector3 magn;
+
+    public Sample(Vector3 acceleration, Quaternion quaternion, Vector3 compass) {
 
         this.acce = acceleration;
         this.quat = quaternion;
+        this.magn = compass;
 
         setTimeNow();
     }
@@ -34,9 +37,10 @@ public class Sample {
         setTimeNow();
     }
 
-    public Sample(double qX, double qY, double qZ, double qW, double aX, double aY, double aZ) {
+    public Sample(double qX, double qY, double qZ, double qW, double aX, double aY, double aZ, double mX, double mY, double mZ) {
         setQuaternion(qX / scale, qY / scale, qZ / scale, qW / scale);
         setAcceleration(aX / scale, aY / scale, aZ / scale);
+
         setTimeNow();
     }
 
@@ -68,38 +72,45 @@ public class Sample {
         acce = new Vector3(x, y, z);
     }
 
+    public void setCompass(double x, double y, double z) {
+        magn = new Vector3(x, y, z);
+    }
+
     public void Zero() {
         acce = new Vector3(0, 0, 0);
         quat = new Quaternion(0, 0, 0, 0);
 
     }
 
-    public static Sample scalarAddition(float theta, Sample a) {
+    public static Sample sclarSubtraction(float theta, Sample a) {
         return new Sample(a.quat.x - theta, a.quat.y - theta, a.quat.z - theta, a.quat.w - theta, a.acce.x - theta,
-                a.acce.y - theta, a.acce.z - theta);
+                a.acce.y - theta, a.acce.z - theta, a.magn.x - theta, a.magn.y - theta, a.magn.z - theta);
     }
 
+    public static Sample scalarAddition(float theta, Sample a) {
+        return new Sample(a.quat.x + theta, a.quat.y + theta, a.quat.z + theta, a.quat.w + theta, a.acce.x + theta,
+                a.acce.y + theta, a.acce.z + theta, a.magn.x + theta, a.magn.y + theta, a.magn.z + theta);
+    }
     public static Sample subtract(Sample a, Sample b) {
 
 
-        return new Sample(Vector3.subtract(a.acce, b.acce), Quaternion.subtract(a.quat, b.quat));
+        return new Sample(Vector3.subtract(a.acce, b.acce), Quaternion.subtract(a.quat, b.quat), Vector3.subtract(a.magn, b.magn));
 
     }
 
     public static Sample add(Sample a, Sample b) {
 
-        return new Sample(Vector3.add(a.acce, b.acce), (Quaternion) Quaternion.add(a.quat, b.quat));
+        return new Sample(Vector3.add(a.acce, b.acce), (Quaternion) Quaternion.add(a.quat, b.quat), Vector3.add(a.magn, b.magn));
 
     }
 
     public static Sample multiply(Sample a, Sample b) {
-        return new Sample(Vector3.crossProduct(a.acce, b.acce), (Quaternion) Quaternion.multiply(a.quat, b.quat));
-
+        return new Sample(Vector3.crossProduct(a.acce, b.acce), (Quaternion) Quaternion.multiply(a.quat, b.quat), Vector3.crossProduct(a.magn, b.magn));
     }
 
     public static Sample divideScalar(Sample a, float theta) {
         return new Sample(a.quat.x / theta, a.quat.y / theta, a.quat.z / theta, a.quat.w / theta, a.acce.x / theta,
-                a.acce.y / theta, a.acce.z / theta);
+                a.acce.y / theta, a.acce.z / theta, a.magn.x / theta, a.magn.y / theta, a.magn.z / theta);
     }
 
     public static boolean greaterThan(Sample a, Sample b) {
@@ -114,7 +125,7 @@ public class Sample {
 
     public String toString() {
 
-        return time + "," + quat.w + "," + quat.x + "," + quat.y + "," + quat.z + "," + acce.x + "," + acce.y + "," + acce.z + "," + acce.magnitude + "\n";
+        return time + "," + quat.w + "," + quat.x + "," + quat.y + "," + quat.z + "," + acce.x + "," + acce.y + "," + acce.z + "," + acce.magnitude + "," + magn.x + "," + magn.y + "," + magn.z + "\n";
 
     }
 }

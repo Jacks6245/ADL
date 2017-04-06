@@ -1,8 +1,5 @@
 package com.example.jackskitt.adlarcherydatalogger.Sensors;
 
-import jssc.SerialPort;
-
-import javax.media.j3d.Transform3D;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -106,11 +103,11 @@ public class Sensor extends Service {
 
                 Sample sample = getSample(sampleBytes);
 
-                Transform3D q = new Transform3D();
+                //Transform3D q = new Transform3D();
                 // point representing the acceleration
                 // sets the acceleration in world coordinates
-                q.setRotation(sample.quat);
-                q.transform(sample.acce);
+                //    q.setRotation(sample.quat);
+                //  q.transform(sample.acce);
 
                 if (SensorStore.getInstance().saveData) {
                     // save the sample
@@ -134,7 +131,10 @@ public class Sensor extends Service {
         float Ay = MathHelper.toInt(buffer[11], buffer[10]);
         float Az = MathHelper.toInt(buffer[13], buffer[12]);
 
-        return new Sample(qx, qy, qz, qw, Ax, Ay, Az);
+        float mx = MathHelper.toInt(buffer[15], buffer[14]);
+        float my = MathHelper.toInt(buffer[17], buffer[16]);
+        float mz = MathHelper.toInt(buffer[19], buffer[20]);
+        return new Sample(qx, qy, qz, qw, Ax, Ay, Az, mx, my, mz);
 
     }
 
@@ -286,6 +286,6 @@ public class Sensor extends Service {
 
     public String getName() {
 
-        return mBluetoothGatt.getDevice().getName();
+        return mBluetoothDeviceAddress;
     }
 }
