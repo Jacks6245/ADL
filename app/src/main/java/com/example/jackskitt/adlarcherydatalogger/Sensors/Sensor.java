@@ -20,16 +20,26 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Binder;
 
 import android.os.IBinder;
 
 import android.util.Log;
+import android.view.View;
 
 
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
 import com.example.jackskitt.adlarcherydatalogger.Collection.SampleStorage;
+import com.example.jackskitt.adlarcherydatalogger.Collection.Sequence;
 import com.example.jackskitt.adlarcherydatalogger.Math.MathHelper;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.UUID;
 
@@ -50,19 +60,13 @@ public class Sensor extends Service {
 
     private boolean DEBUG = false;
 
-    public SensorCollector graphStorage;
-
-    public SampleStorage sampleStore;
-
     private BluetoothGatt mBluetoothGatt;
 
     private int mConnectionState = STATE_DISCONNECTED;
     private String mBluetoothDeviceAddress;
     public int id;
-//needs replacing with the charts api
-    //  public DrawCanvas accCanvas;
-    //  public DrawCanvas quatCanvas;
-
+    //needs replacing with the charts api
+    public LineChart[] charts = new LineChart[3];
 
     public boolean collectData;
 
@@ -88,11 +92,7 @@ public class Sensor extends Service {
     }
 
     public Sensor() {
-        graphStorage = new SensorCollector(this);
-        sampleStore = new SampleStorage(this);
 
-        // accCanvas = new DrawCanvas();
-        //  quatCanvas = new DrawCanvas();
     }
 
 
@@ -111,29 +111,78 @@ public class Sensor extends Service {
 
                 if (SensorStore.getInstance().saveData) {
                     // save the sample
-                    sampleStore.addSample(sample);
+                    Sequence.getInstance().sequenceData[id].addSample(sample);
+
+                    for (int i = 0; i < 3; i++) {
+                        addEntryToChart(charts[i], (float) sample.acce.getValueByNumber(i));
+                    }
                 }
                 // further process the sample
-                graphStorage.data.addSample(sample);
 
             }
         }
     }
 
+    private void addEntryToChart(LineChart chart, float dataToAdd) {
+
+        LineData data = chart.getData();
+
+        if (data != null) {
+
+            ILineDataSet set = data.getDataSetByIndex(0);
+            // set.addEntry(...); // can be called as well
+
+            if (set == null) {
+                set = createSet();
+                data.addDataSet(set);
+            }
+
+            data.addEntry(new Entry(set.getEntryCount(), dataToAdd), 0);
+            data.notifyDataChanged();
+
+            // let the chart know it's data has changed
+            chart.notifyDataSetChanged();
+
+            // limit the number of visible entries
+            chart.setVisibleXRangeMaximum(50);
+            // mChart.setVisibleYRange(30, AxisDependency.LEFT);
+
+            // move to the latest entry
+            chart.moveViewToX(data.getEntryCount());
+
+        }
+    }
+
+    private LineDataSet createSet() {
+
+        LineDataSet set = new LineDataSet(null, "Dynamic Data");
+        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set.setColor(Color.WHITE);
+        set.setDrawCircles(false);
+        set.setLineWidth(2f);
+        set.setFillAlpha(65);
+        set.setFillColor(Color.WHITE);
+        set.setHighLightColor(Color.rgb(244, 117, 117));
+        set.setValueTextColor(Color.WHITE);
+        set.setValueTextSize(9f);
+        set.setDrawValues(false);
+        return set;
+    }
+
     private Sample getSample(byte[] buffer) {
 
-        float qw = MathHelper.toInt(buffer[1], buffer[0]);
-        float qx = MathHelper.toInt(buffer[3], buffer[2]);
-        float qy = MathHelper.toInt(buffer[5], buffer[4]);
-        float qz = MathHelper.toInt(buffer[7], buffer[6]);
+        float Ax = MathHelper.toInt(buffer[1], buffer[0]);
+        float Ay = MathHelper.toInt(buffer[3], buffer[2]);
+        float Az = MathHelper.toInt(buffer[5], buffer[4]);
 
-        float Ax = MathHelper.toInt(buffer[9], buffer[8]);
-        float Ay = MathHelper.toInt(buffer[11], buffer[10]);
-        float Az = MathHelper.toInt(buffer[13], buffer[12]);
+        float mx = MathHelper.toInt(buffer[7], buffer[6]);
+        float my = MathHelper.toInt(buffer[9], buffer[8]);
+        float mz = MathHelper.toInt(buffer[11], buffer[10]);
 
-        float mx = MathHelper.toInt(buffer[15], buffer[14]);
-        float my = MathHelper.toInt(buffer[17], buffer[16]);
-        float mz = MathHelper.toInt(buffer[19], buffer[20]);
+        float qw = MathHelper.toInt(buffer[13], buffer[12]);
+        float qx = MathHelper.toInt(buffer[15], buffer[14]);
+        float qy = MathHelper.toInt(buffer[17], buffer[16]);
+        float qz = MathHelper.toInt(buffer[19], buffer[20]);
         return new Sample(qx, qy, qz, qw, Ax, Ay, Az, mx, my, mz);
 
     }
@@ -186,6 +235,7 @@ public class Sensor extends Service {
         }
         mBluetoothGatt.disconnect();
     }
+
 
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override

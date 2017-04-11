@@ -1,6 +1,8 @@
 package com.example.jackskitt.adlarcherydatalogger.UI;
 
 import android.app.FragmentTransaction;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 
@@ -10,6 +12,7 @@ import android.os.Bundle;
 
 import com.example.jackskitt.adlarcherydatalogger.Adapters.TabViewAdapter;
 import com.example.jackskitt.adlarcherydatalogger.R;
+import com.example.jackskitt.adlarcherydatalogger.Sensors.SensorStore;
 
 public class MainActivity extends FragmentActivity {
     private ViewPager viewPage;
@@ -26,9 +29,13 @@ public class MainActivity extends FragmentActivity {
         viewPage.setAdapter(new TabViewAdapter(getFragmentManager(),
                 MainActivity.this));
 
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        SensorStore.getInstance().mBluetoothAdapter = bluetoothManager.getAdapter();
+
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
         tabLayout.setupWithViewPager(viewPage);
+
 
     }
 

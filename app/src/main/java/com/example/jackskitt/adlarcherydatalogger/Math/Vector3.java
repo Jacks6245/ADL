@@ -10,14 +10,12 @@ public class Vector3 extends Point3d {
 
     public float magnitude;
 
-    public static int[] colours = {Color.rgb(255, 0, 0), Color.rgb(0, 255, 0), Color.rgb(0, 0, 255)};
 
     public Vector3(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
         magnitude();
-
     }
 
     public Vector3() {

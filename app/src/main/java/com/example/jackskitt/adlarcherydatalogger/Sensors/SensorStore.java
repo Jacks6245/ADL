@@ -5,8 +5,10 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 
+import com.example.jackskitt.adlarcherydatalogger.Collection.SampleStorage;
+import com.example.jackskitt.adlarcherydatalogger.Collection.Sequence;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,27 +57,15 @@ public class SensorStore {
 
     public SensorStore() {
         // perform an initial search
-        searchForSensors();
+        createBlankSensors();
     }
 
-    public void searchForSensors() {
+    public void createBlankSensors() {
 
-        for (Sensor sensor : sensorStorage) {
-            if (sensor != null) {
-                sensor.collectData = false;
-                sensor.close();
-            }
-        }
-
-        sensorStorage.clear();
-        outgoingPorts.clear();
-        numSensors = 0;
-
-        System.out.println("Searching for Sensors...");
-        findOutgoingPorts();
-        if (outgoingPorts.isEmpty()) {
-            System.out.println("Sorry - couldn't find any sensors");
-            hasSensors = false;
+        for (int i = 0; i < 2; i++) {
+            Sensor tempSensor = new Sensor();
+            tempSensor.id = i;
+            sensorStorage.add(tempSensor);
         }
     }
 
@@ -116,8 +106,8 @@ public class SensorStore {
 
     public void clearLog() {
         if (hasSensors) {
-            for (Sensor sensor : sensorStorage) {
-                sensor.sampleStore.getSamples().clear();// wipes the storage
+            for (SampleStorage storage : Sequence.getInstance().sequenceData) {
+                storage.getSamples().clear();// wipes the storage
             }
         }
     }

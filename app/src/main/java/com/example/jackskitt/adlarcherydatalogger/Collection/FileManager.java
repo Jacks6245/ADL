@@ -36,13 +36,14 @@ public class FileManager {
         StringBuilder builder = new StringBuilder();
         // builds a header for the s ensor, having it's id, port number and
         // length
-        builder.append("#" + s.id + "," + s.getName() + "," + s.sampleStore.getTimeDifference() + "\n");
-        for (Marker a : s.sampleStore.markers) {
+        builder.append("#" + s.id + "," + s.getName() + "," + Sequence.getInstance().sequenceData[s.id].getTimeDifference() + "\n");
+        for (Marker a : Sequence.getInstance().sequenceData[s.id].markers) {
             builder.append("?" + a.startTime + "," + a.endTime + "," + a.note + "\n");
         }
-        for (Sample a : s.sampleStore.getSamples()) {
-            builder.append(s.sampleStore.getLocalTime(a.time) + "," + a.toString());
+        for (Sample a : Sequence.getInstance().sequenceData[s.id].getSamples()) {
+            builder.append(Sequence.getInstance().sequenceData[s.id].getLocalTime(a.time) + "," + a.toString());
         }
+
 
         return builder.toString();
     }
