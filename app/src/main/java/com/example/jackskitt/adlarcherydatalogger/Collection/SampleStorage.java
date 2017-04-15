@@ -1,25 +1,18 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
-import java.util.ArrayList;
-
-import com.example.jackskitt.adlarcherydatalogger.Math.Averager;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
+
+import java.util.ArrayList;
 
 public class SampleStorage {
 
-    private ArrayList<Sample> samples = new ArrayList<Sample>();
-
     public ArrayList<Marker> markers = new ArrayList<Marker>();
-
     public Sensor sensorRef;
-
     public String sensorName;
-
-    public int sensorID;
-
-    public long lengthOfSample;
-
-    public int listSize;
+    public int    sensorID;
+    public long   lengthOfSample;
+    public int    listSize;
+    private ArrayList<Sample> samples = new ArrayList<Sample>();
 
     public SampleStorage(Sensor sensor) {
         // TODO Auto-generated constructor stub
@@ -46,5 +39,12 @@ public class SampleStorage {
     public long getLocalTime(long sensorTime) {
 
         return sensorTime - samples.get(0).time;
+    }
+
+    public void clear() {
+        markers.clear();
+        lengthOfSample = 0;
+        listSize = 0;
+        samples.clear();
     }
 }

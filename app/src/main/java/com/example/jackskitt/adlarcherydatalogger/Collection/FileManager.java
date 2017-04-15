@@ -2,8 +2,15 @@ package com.example.jackskitt.adlarcherydatalogger.Collection;
 
 import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.SensorStore;
+import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,12 +21,12 @@ public class FileManager {
         StringBuilder sb = new StringBuilder();
 
         sb.append(name + ",\t" + sessionID + "\n");
-        for (Sensor sensor : SensorStore.getInstance().sensorStorage) {
-            sb.append(encodeSensor(sensor));
-        }
+        sb.append(encodeSensor(MainActivity.getInstance().store.sensors[0]));
+        sb.append(encodeSensor(MainActivity.getInstance().store.sensors[1]));
+
 
         try {
-            Date date = new Date();
+            Date             date       = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
             File file = new File(
                     "./data/LOG_" + dateFormat.format(date) + "_" + System.currentTimeMillis() % 1000 + ".csv");
@@ -53,9 +60,9 @@ public class FileManager {
         try {
             reader = new BufferedReader(new FileReader(name));
 
-            String line = null;
+            String   line         = null;
             Sequence tempSequence = new Sequence();
-            int sensorIndex = -1;
+            int      sensorIndex  = -1;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("@")) {
                     String[] values = line.split(",");
@@ -107,7 +114,7 @@ public class FileManager {
     public static ArrayList<String> findAllFilesForUser(String user, String directory) {
         ArrayList<String> names = new ArrayList<String>();
 
-        File folder = new File("./" + directory);
+        File   folder      = new File("./" + directory);
         File[] listOfFiles = folder.listFiles();
 
         for (File file : listOfFiles) {

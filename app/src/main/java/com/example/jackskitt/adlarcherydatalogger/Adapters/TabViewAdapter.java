@@ -1,10 +1,9 @@
 package com.example.jackskitt.adlarcherydatalogger.Adapters;
 
-import android.content.Context;
-
+import android.app.Application;
 import android.app.Fragment;
 import android.app.FragmentManager;
-
+import android.content.Context;
 import android.support.v13.app.FragmentPagerAdapter;
 
 import com.example.jackskitt.adlarcherydatalogger.Sensors.SensorStore;
@@ -28,6 +27,8 @@ public class TabViewAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int index) {
+
+
         switch (index) {
             case 0:
                 //Setup Activity
@@ -37,13 +38,15 @@ public class TabViewAdapter extends FragmentPagerAdapter {
             case 1:
                 //chart 1
                 SensorView tempView = new SensorView();
-                tempView.viewingSensor = SensorStore.getInstance().sensorStorage.get(0);
+
+                tempView.viewingSensor = MainActivity.getInstance().store.sensors[0];
 
                 return tempView;
             case 2:
                 //chart 2
                 SensorView tempView2 = new SensorView();
-                tempView2.viewingSensor = SensorStore.getInstance().sensorStorage.get(1);
+
+                tempView2.viewingSensor = MainActivity.getInstance().store.sensors[1];
                 return tempView2;
             case 3:
                 //analysis

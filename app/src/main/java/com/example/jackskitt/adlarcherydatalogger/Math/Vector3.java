@@ -1,9 +1,5 @@
 package com.example.jackskitt.adlarcherydatalogger.Math;
 
-import javax.vecmath.Quat4d;
-
-import android.graphics.Color;
-
 import javax.vecmath.Point3d;
 
 public class Vector3 extends Point3d {
@@ -28,11 +24,6 @@ public class Vector3 extends Point3d {
         return new Vector3(base.x + toAdd.x, base.y + toAdd.y, base.z + toAdd.z);
     }
 
-    private void magnitude() {
-        magnitude = (float) Math.sqrt((this.x * this.x) + (this.y * this.y) + (this.z * this.z));
-
-    }
-
     public static Vector3 scalar(Vector3 base, float scalar) {
         return new Vector3(base.x * scalar, base.y * scalar, base.z * scalar);
 
@@ -53,6 +44,11 @@ public class Vector3 extends Point3d {
 
     public static boolean lessThan(Vector3 a, Vector3 b) {
         return a.x < b.x && a.y < b.y && a.z < b.z;
+    }
+
+    private void magnitude() {
+        magnitude = (float) Math.sqrt((this.x * this.x) + (this.y * this.y) + (this.z * this.z));
+
     }
 
     public double getValueByNumber(int i) {

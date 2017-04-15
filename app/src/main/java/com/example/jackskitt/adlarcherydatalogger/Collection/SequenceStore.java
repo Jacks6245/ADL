@@ -21,7 +21,7 @@ public class SequenceStore {
 
     public void getAllLogs(String user) {
         Object[] fileNames = FileManager.findAllFilesForUser(user, "./data").toArray();
-        int numSeq = 0;
+        int      numSeq    = 0;
         for (Object file : fileNames) {
             Sequence tempSeq = FileManager.readFile((String) file);
             if (tempSeq.sequenceData[1].equals(null)) {

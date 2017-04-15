@@ -31,6 +31,14 @@ public class Quaternion extends Quat4d {
         return new Quaternion(a.w / theta, a.x / theta, a.y / theta, a.z / theta);
     }
 
+    public static boolean greaterThan(Quat4d a, Quat4d b) {
+        return a.w > b.w && a.x > b.x && a.y > b.y && a.z > b.z;
+    }
+
+    public static boolean lessThan(Quat4d a, Quat4d b) {
+        return a.w < b.w && a.x < b.x && a.y < b.y && a.z < b.z;
+    }
+
     public double getValueByNumber(int i) {
         switch (i) {
             case 0:
@@ -60,13 +68,5 @@ public class Quaternion extends Quat4d {
                 z = value;
                 break;
         }
-    }
-
-    public static boolean greaterThan(Quat4d a, Quat4d b) {
-        return a.w > b.w && a.x > b.x && a.y > b.y && a.z > b.z;
-    }
-
-    public static boolean lessThan(Quat4d a, Quat4d b) {
-        return a.w < b.w && a.x < b.x && a.y < b.y && a.z < b.z;
     }
 }

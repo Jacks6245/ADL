@@ -1,26 +1,17 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
-import com.example.jackskitt.adlarcherydatalogger.Sensors.*;
+import com.example.jackskitt.adlarcherydatalogger.Math.Quaternion;
+import com.example.jackskitt.adlarcherydatalogger.Math.Vector3;
 
-import com.example.jackskitt.adlarcherydatalogger.Math.*;
-
-import java.math.*;
-import java.sql.Date;
 import java.util.Calendar;
-
-import javax.vecmath.Quat4d;
 
 public class Sample {
 
-    public long time;
-
-    private float scale = 10000;
-
-    public Vector3 acce;
-
+    public long       time;
+    public Vector3    acce;
     public Quaternion quat;
-
-    public Vector3 magn;
+    public Vector3    magn;
+    private float scale = 10000;
 
     public Sample(Vector3 acceleration, Quaternion quaternion, Vector3 compass) {
 
@@ -36,12 +27,18 @@ public class Sample {
         Zero();
         setTimeNow();
     }
-
     public Sample(double qX, double qY, double qZ, double qW, double aX, double aY, double aZ, double mX, double mY, double mZ) {
         setQuaternion(qX / scale, qY / scale, qZ / scale, qW / scale);
         setAcceleration(aX / scale, aY / scale, aZ / scale);
-
+        setCompass(mX / scale, mY / scale, mZ / scale);
         setTimeNow();
+    }
+
+    public Sample(double qX, double qY, double qZ, double qW, double aX, double aY, double aZ, double mX, double mY, double mZ, long time) {
+        setQuaternion(qX / scale, qY / scale, qZ / scale, qW / scale);
+        setAcceleration(aX / scale, aY / scale, aZ / scale);
+        setCompass(mX / scale, mY / scale, mZ / scale);
+        this.time = time;
     }
 
     public Sample(String[] values) {
@@ -60,28 +57,6 @@ public class Sample {
 
     }
 
-    public void setTimeNow() {
-        time = Calendar.getInstance().getTimeInMillis();
-    }
-
-    public void setQuaternion(double w, double x, double y, double z) {
-        quat = new Quaternion(w, x, y, z);
-    }
-
-    public void setAcceleration(double x, double y, double z) {
-        acce = new Vector3(x, y, z);
-    }
-
-    public void setCompass(double x, double y, double z) {
-        magn = new Vector3(x, y, z);
-    }
-
-    public void Zero() {
-        acce = new Vector3(0, 0, 0);
-        quat = new Quaternion(0, 0, 0, 0);
-
-    }
-
     public static Sample sclarSubtraction(float theta, Sample a) {
         return new Sample(a.quat.x - theta, a.quat.y - theta, a.quat.z - theta, a.quat.w - theta, a.acce.x - theta,
                 a.acce.y - theta, a.acce.z - theta, a.magn.x - theta, a.magn.y - theta, a.magn.z - theta);
@@ -91,6 +66,7 @@ public class Sample {
         return new Sample(a.quat.x + theta, a.quat.y + theta, a.quat.z + theta, a.quat.w + theta, a.acce.x + theta,
                 a.acce.y + theta, a.acce.z + theta, a.magn.x + theta, a.magn.y + theta, a.magn.z + theta);
     }
+
     public static Sample subtract(Sample a, Sample b) {
 
 
@@ -120,6 +96,28 @@ public class Sample {
 
     public static boolean lessThan(Sample a, Sample b) {
         return Quaternion.lessThan(a.quat, b.quat) && Vector3.lessThan(a.acce, b.acce);
+
+    }
+
+    public void setTimeNow() {
+        time = Calendar.getInstance().getTimeInMillis();
+    }
+
+    public void setQuaternion(double w, double x, double y, double z) {
+        quat = new Quaternion(w, x, y, z);
+    }
+
+    public void setAcceleration(double x, double y, double z) {
+        acce = new Vector3(x, y, z);
+    }
+
+    public void setCompass(double x, double y, double z) {
+        magn = new Vector3(x, y, z);
+    }
+
+    public void Zero() {
+        acce = new Vector3(0, 0, 0);
+        quat = new Quaternion(0, 0, 0, 0);
 
     }
 

@@ -8,13 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.example.jackskitt.adlarcherydatalogger.R;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
@@ -24,23 +27,15 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 public class SensorView extends Fragment implements OnChartValueSelectedListener {
 
-    public Sensor viewingSensor;
-
-    private enum Selection {
-        ACCELERATION,
-        ROTATION,
-        COMPASS
-    }
-
-    public Selection chartType = Selection.ACCELERATION;
-
-    public TextView title;
-
-    private RadioGroup chartGroup;
-
     public static int[] colours = {Color.rgb(250, 104, 104), Color.rgb(117, 201, 69), Color.rgb(60, 123, 219)};
+    public Sensor viewingSensor;
+    public Sensor.CHART_TYPE chartType = Sensor.CHART_TYPE.ACCELERATION;
 
-
+    public  TextView     title;
+    public  ToggleButton recordToggle;
+    public  ToggleButton averageToggle;
+    public  Button       resetButton;
+    private RadioGroup   chartGroup;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,63 +60,123 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
                 switch (checkedId) {
 
                     case R.id.accButton:
-                        chartType = Selection.ACCELERATION;
+                        chartType = Sensor.CHART_TYPE.ACCELERATION;
                         title.setText("Acceleration");
 
                         break;
                     case R.id.rotButton:
-                        chartType = Selection.ROTATION;
+                        chartType = Sensor.CHART_TYPE.ROTATION;
                         title.setText("Rotation");
                         break;
                     case R.id.magButton:
-                        chartType = Selection.COMPASS;
+                        chartType = Sensor.CHART_TYPE.COMPASS;
                         title.setText("Compass");
                         break;
                 }
+                viewingSensor.currentType = chartType;
             }
         });
 
         chartGroup.performClick();
 
         //sensors are null so crashes
+        viewingSensor.chartViewReference = this;
         viewingSensor.charts[0] = (LineChart) view.findViewById(R.id.chart1);
         viewingSensor.charts[1] = (LineChart) view.findViewById(R.id.chart2);
         viewingSensor.charts[2] = (LineChart) view.findViewById(R.id.chart3);
 
+        recordToggle = (ToggleButton) view.findViewById(R.id.recordToggle);
+        averageToggle = (ToggleButton) view.findViewById(R.id.averageToggle);
+
+        resetButton = (Button) view.findViewById(R.id.resetButton);
+
+        recordToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                MainActivity.getInstance().store.setCollectData(isChecked);
+
+            }
+        });
+
+        averageToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                } else {
+                    // The toggle is disabled
+                }
+            }
+        });
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (viewingSensor != null) {
+                    viewingSensor.restartCharts();
+                }
+            }
+        });
+
+
         for (int i = 0; i < 3; i++) {
             setupChart(viewingSensor.charts[i]);
             viewingSensor.charts[i].setBackgroundColor(colours[i]);
+            viewingSensor.charts[i].setGridBackgroundColor(colours[i]);
         }
 
         return view;
     }
 
     private void setupChart(LineChart chart) {
+
+
         chart.setOnChartValueSelectedListener(this);
 
         chart.setDrawGridBackground(true);
 
-        chart.getDescription().setEnabled(true);
+        chart.getDescription().setEnabled(false);
 
-        chart.setDrawBorders(true);
+        chart.getLegend().setEnabled(false);
+
+        chart.setDrawBorders(false);
 
         chart.getAxisLeft().setDrawZeroLine(true);
 
-        chart.getAxisLeft().setDrawAxisLine(true);
+        chart.getAxisLeft().setDrawAxisLine(false);
 
         chart.getXAxis().setDrawAxisLine(true);
 
-        chart.getXAxis().setDrawGridLines(true);
+        chart.getXAxis().setDrawGridLines(false);
 
+        chart.getAxisRight().setEnabled(false);
+        chart.getXAxis().setEnabled(false);
         chart.setTouchEnabled(true);
+
+        chart.setBorderColor(Color.WHITE);
+
+        chart.setNoDataTextColor(Color.WHITE);
+
+        chart.setAutoScaleMinMaxEnabled(false);
 
         chart.setDragEnabled(true);
 
         chart.setScaleEnabled(true);
-
+        chart.getAxisLeft().setGridColor(Color.WHITE);
+        chart.getAxisLeft().setTextColor(Color.WHITE);
+        chart.getAxisLeft().setZeroLineColor(Color.BLACK);
+        chart.getAxisLeft().setAxisMinimum(-3f);
+        chart.getAxisLeft().setAxisMaximum(3f);
         chart.setPinchZoom(true);
 
+        LineData data = new LineData();
+        data.setValueTextColor(Color.WHITE);
+
+        // add empty data
+        chart.setData(data);
+
+
     }
+
 
     @Override
     public void onValueSelected(Entry e, Highlight h) {

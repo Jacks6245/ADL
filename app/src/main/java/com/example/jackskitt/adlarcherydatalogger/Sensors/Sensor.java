@@ -1,107 +1,147 @@
 package com.example.jackskitt.adlarcherydatalogger.Sensors;
 
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Binder;
-
-import android.os.IBinder;
-
+import android.os.AsyncTask;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
-
 
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
-import com.example.jackskitt.adlarcherydatalogger.Collection.SampleStorage;
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sequence;
 import com.example.jackskitt.adlarcherydatalogger.Math.MathHelper;
+import com.example.jackskitt.adlarcherydatalogger.UI.SensorView;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
-import java.util.UUID;
+public class Sensor {
 
-public class Sensor extends Service {
-
-    private final static String TAG = Sensor.class.getSimpleName();
-
-    public final static String INTENT_ACTION_GATT_CONNECTED = "INTENT_ACTION_GATT_CONNECTED";
-    public final static String INTENT_ACTION_GATT_DISCONNECTED = "INTENT_ACTION_GATT_DISCONNECTED";
+    public final static String INTENT_ACTION_GATT_CONNECTED           = "INTENT_ACTION_GATT_CONNECTED";
+    public final static String INTENT_ACTION_GATT_DISCONNECTED        = "INTENT_ACTION_GATT_DISCONNECTED";
     public final static String INTENT_ACTION_GATT_SERVICES_DISCOVERED = "INTENT_ACTION_GATT_SERVICES_DISCOVERED";
-    public final static String INTENT_ACTION_DATA_AVAILABLE = "INTENT_ACTION_DATA_AVAILABLE";
-    public final static String INTENT_ACTION_EXTRA_DATA = "INTENT_ACTION_EXTRA_DATA";
-    public final static String INTENT_DEVICE_DOES_NOT_SUPPORT_UART = "INTENT_DEVICE_DOES_NOT_SUPPORT_UART";
+    public final static String INTENT_ACTION_DATA_AVAILABLE           = "INTENT_ACTION_DATA_AVAILABLE";
+    public final static String INTENT_ACTION_EXTRA_DATA               = "INTENT_ACTION_EXTRA_DATA";
+    public final static String INTENT_DEVICE_DOES_NOT_SUPPORT_UART    = "INTENT_DEVICE_DOES_NOT_SUPPORT_UART";
+    public final static String INTENT_ACTION_DATA_DISPLAY             = "INTENT_ACTION_DATA_DISPLAY";
 
-    private static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    private static final int STATE_CONNECTED = 2;
-
-    private boolean DEBUG = false;
-
-    private BluetoothGatt mBluetoothGatt;
-
-    private int mConnectionState = STATE_DISCONNECTED;
-    private String mBluetoothDeviceAddress;
-    public int id;
-    //needs replacing with the charts api
+    private final static String TAG = "com.example.jackskitt.adlarcherydatalogger.";
+    ;
+    public boolean    collectData;
+    public int        id;
+    public SensorView chartViewReference;
     public LineChart[] charts = new LineChart[3];
+    public BluetoothDevice device;
+    public BluetoothGatt   mBluetoothGatt;
+    public CHART_TYPE currentType = CHART_TYPE.ACCELERATION;
 
-    public boolean collectData;
+    private LocalBroadcastManager managerRef;
+    private CONNECTED_STATE connectionState = CONNECTED_STATE.DISCONNECTED;
+    private Context superContext;
+    private boolean DEBUG = false;
+    //
 
-    public boolean drawnCanvas = false;
+    public final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+        final Intent blueIntent = new Intent();
 
-    public class LocalBinder extends Binder {
-        Sensor getService() {
-            return Sensor.this;
+        @Override
+
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+
+                connectionState = CONNECTED_STATE.CONNECTED;
+                blueIntent.setAction(INTENT_ACTION_GATT_CONNECTED);
+                blueIntent.putExtra("sensor", id);
+                superContext.sendBroadcast(blueIntent);
+                //       mBluetoothGatt.discoverServices();
+
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+
+                connectionState = CONNECTED_STATE.DISCONNECTED;
+                blueIntent.setAction(INTENT_ACTION_GATT_DISCONNECTED);
+                blueIntent.putExtra("sensor", id);
+                superContext.sendBroadcast(blueIntent);
+            }
         }
+
+        //need to send a notification to the SensorStore once services have been discovered
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (mBluetoothGatt != null) {
+                    Log.d(this.getClass().getSimpleName(), "discovered: " + gatt.getServices());
+                }
+                blueIntent.setAction(INTENT_ACTION_GATT_SERVICES_DISCOVERED);
+                blueIntent.putExtra("sensor", id);
+                superContext.sendBroadcast(blueIntent);
+
+                //     setCharacteristicNotificationNRFUartTX(true);
+            } else {
+                Log.w(this.getClass().getSimpleName(), "onServicesDiscovered: " + status);
+            }
+            //Auto-enable notifications from device:
+
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            if (DEBUG) Log.d(this.getClass().getSimpleName(), "onCharacteristicRead");
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                blueIntent.setAction(INTENT_ACTION_EXTRA_DATA);
+                blueIntent.putExtra("sensor", id);
+                superContext.sendBroadcast(blueIntent);
+            }
+        }
+
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
+            if (DEBUG) Log.d(this.getClass().getSimpleName(), "incoming data");
+            //parse and write to file
+
+            processSample(characteristic.getValue());
+
+
+            updateCharts();
+
+
+            //  superContext.sendBroadcast(blueIntent);
+
+
+        }
+    };
+
+    public Sensor(Context storeContext) {
+        this.superContext = storeContext;
+
     }
 
-    private final IBinder mBinder = new LocalBinder();
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
+    public void restartCharts() {
+        for (LineChart chart : charts) {
+            chart.setData(new LineData());
+        }
+        Sequence.getInstance().sequenceData[id].clear();
     }
 
-    @Override
-    public boolean onUnbind(Intent intent) {
-        close();
-        return super.onUnbind(intent);
-    }
-
-    public Sensor() {
-
-    }
-
-
-    public void processSample(byte[] sampleBytes) {
+    //TODO: this needs to be in the sensor thread
+    public void processSample(byte[] sampleData) {
         if (collectData) {
-            System.out.println("Process values");
-            if (sampleBytes != null) {
+            if (sampleData != null) {
 
-                Sample sample = getSample(sampleBytes);
+                Sample sample = getSample(sampleData);
 
                 //Transform3D q = new Transform3D();
                 // point representing the acceleration
@@ -109,25 +149,60 @@ public class Sensor extends Service {
                 //    q.setRotation(sample.quat);
                 //  q.transform(sample.acce);
 
-                if (SensorStore.getInstance().saveData) {
-                    // save the sample
-                    Sequence.getInstance().sequenceData[id].addSample(sample);
+                //       if (true) {
+                // save the sample
+                //         Sequence.getInstance().sequenceData[id].addSample(sample);
+                //   }
 
-                    for (int i = 0; i < 3; i++) {
-                        addEntryToChart(charts[i], (float) sample.acce.getValueByNumber(i));
-                    }
-                }
-                // further process the sample
+
+                addSampleToChart(sample);
+
+
 
             }
         }
     }
 
+    public void addSampleToChart(Sample sampleToAdd) {
+        for (int i = 0; i < 3; i++) {
+            double value = 0;
+            if (currentType == CHART_TYPE.ACCELERATION) {
+                value = sampleToAdd.acce.getValueByNumber(i);
+            } else if (currentType == CHART_TYPE.ROTATION) {
+                value = sampleToAdd.quat.getValueByNumber(i + 1);//need to fix this
+            } else if (currentType == CHART_TYPE.COMPASS) {
+                value = sampleToAdd.magn.getValueByNumber(i);
+            }
+
+            addEntryToChart(charts[i], (float) value);
+
+        }
+    }
+
+    private void updateCharts() {
+        for (int i = 0; i < 3; i++) {
+
+            charts[i].getData().notifyDataChanged();
+            charts[i].notifyDataSetChanged();
+
+            // limit the number of visible entries
+            // mChart.setVisibleYRange(30, AxisDependency.LEFT);
+
+            // move to the latest entry
+            charts[i].moveViewToX(charts[i].getData().getEntryCount());
+            charts[i].setVisibleXRangeMaximum(300);
+            charts[i].setVisibleYRange(-3.5f, 3.5f, YAxis.AxisDependency.LEFT);
+        }
+    }
+
+    public Context getSuperContext() {
+        return superContext;
+    }
+
+    //this needs to be in the UI Thread, possibly moved to a different class
     private void addEntryToChart(LineChart chart, float dataToAdd) {
 
         LineData data = chart.getData();
-
-        if (data != null) {
 
             ILineDataSet set = data.getDataSetByIndex(0);
             // set.addEntry(...); // can be called as well
@@ -138,24 +213,14 @@ public class Sensor extends Service {
             }
 
             data.addEntry(new Entry(set.getEntryCount(), dataToAdd), 0);
-            data.notifyDataChanged();
 
-            // let the chart know it's data has changed
-            chart.notifyDataSetChanged();
 
-            // limit the number of visible entries
-            chart.setVisibleXRangeMaximum(50);
-            // mChart.setVisibleYRange(30, AxisDependency.LEFT);
-
-            // move to the latest entry
-            chart.moveViewToX(data.getEntryCount());
-
-        }
+        // let the chart know it's data has change
     }
 
     private LineDataSet createSet() {
 
-        LineDataSet set = new LineDataSet(null, "Dynamic Data");
+        LineDataSet set = new LineDataSet(null, "sensorData");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setColor(Color.WHITE);
         set.setDrawCircles(false);
@@ -166,164 +231,56 @@ public class Sensor extends Service {
         set.setValueTextColor(Color.WHITE);
         set.setValueTextSize(9f);
         set.setDrawValues(false);
+
         return set;
     }
 
     private Sample getSample(byte[] buffer) {
 
-        float Ax = MathHelper.toInt(buffer[1], buffer[0]);
-        float Ay = MathHelper.toInt(buffer[3], buffer[2]);
-        float Az = MathHelper.toInt(buffer[5], buffer[4]);
+        float Ax = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.AX_HI_POSITION, MathHelper.AX_LO_POSITION);
+        float Ay = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.AY_HI_POSITION, MathHelper.AY_LO_POSITION);
+        float Az = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.AZ_HI_POSITION, MathHelper.AZ_LO_POSITION);
 
-        float mx = MathHelper.toInt(buffer[7], buffer[6]);
-        float my = MathHelper.toInt(buffer[9], buffer[8]);
-        float mz = MathHelper.toInt(buffer[11], buffer[10]);
+        float mx = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.MX_HI_POSITION, MathHelper.MX_LO_POSITION);
+        float my = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.MY_HI_POSITION, MathHelper.MY_LO_POSITION);
+        float mz = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.MZ_HI_POSITION, MathHelper.MZ_LO_POSITION);
 
-        float qw = MathHelper.toInt(buffer[13], buffer[12]);
-        float qx = MathHelper.toInt(buffer[15], buffer[14]);
-        float qy = MathHelper.toInt(buffer[17], buffer[16]);
-        float qz = MathHelper.toInt(buffer[19], buffer[20]);
-        return new Sample(qx, qy, qz, qw, Ax, Ay, Az, mx, my, mz);
+        float qw = 0;
+        float qx = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.GX_HI_POSITION, MathHelper.GX_LO_POSITION);
+        float qy = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.GY_HI_POSITION, MathHelper.GY_LO_POSITION);
+        float qz = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.GZ_HI_POSITION, MathHelper.GZ_LO_POSITION);
 
-    }
+        long time = MathHelper.getSequence(buffer, MathHelper.T0_SEQ0_POSITION);
+        return new Sample(qx, qy, qz, qw, Ax, Ay, Az, mx, my, mz, time);
 
-    public boolean connect(final String deviceAddress) {
-        if (DEBUG) Log.d(TAG, "connect");
-        if (SensorStore.getInstance().mBluetoothAdapter == null || deviceAddress == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized or unspecified address");
-            return false;
-        }
-
-        if (mBluetoothDeviceAddress != null && deviceAddress.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null) {
-            if (DEBUG) Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection");
-            if (mBluetoothGatt.connect()) {
-                mConnectionState = STATE_CONNECTING;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        final BluetoothDevice device = SensorStore.getInstance().mBluetoothAdapter.getRemoteDevice(deviceAddress);
-        if (device == null) {
-            Log.w(TAG, "Unable to connect, device not found");
-            return false;
-        }
-
-        mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-        if (DEBUG) Log.d(TAG, "Trying to create a new connection");
-        mBluetoothDeviceAddress = deviceAddress;
-        mConnectionState = STATE_CONNECTING;
-
-        return true;
     }
 
     //sensor connector stuff
         /* Closes the gatt client when device is not needed for use anymore */
-    public void close() {
-        if (mBluetoothGatt == null) return;
-        mBluetoothDeviceAddress = null;
-        mBluetoothGatt.close();
-        mBluetoothGatt = null;
-    }
 
     /* Disconnects a connection or cancels a pending connection, needs to go in the sensor */
-    public void disconnect() {
-        if (SensorStore.getInstance().mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
-            return;
-        }
-        mBluetoothGatt.disconnect();
-    }
-
-
-    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            String intentAction;
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "mGattCallback - Connected to GATT server");
-                mConnectionState = STATE_CONNECTED;
-                intentAction = INTENT_ACTION_GATT_CONNECTED;
-                broadcastUpdate(intentAction);
-                if (mBluetoothGatt != null) {
-                    Log.i(TAG, "mGattCallback - Starting service discovery: " + mBluetoothGatt.discoverServices());
-                }
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i(TAG, "mGattCallback - Disconnected from GATT server");
-                mConnectionState = STATE_DISCONNECTED;
-                intentAction = INTENT_ACTION_GATT_DISCONNECTED;
-                broadcastUpdate(intentAction);
-            }
-        }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if (DEBUG) Log.d(TAG, "onServicesDiscovered");
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (mBluetoothGatt != null) {
-                    Log.d(TAG, "discovered: " + gatt.getServices());
-                }
-                broadcastUpdate(INTENT_ACTION_GATT_SERVICES_DISCOVERED);
-            } else {
-                Log.w(TAG, "onServicesDiscovered: " + status);
-            }
-            //Auto-enable notifications from device:
-            //setCharacteristicNotificationNRFUartTX(true);
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            if (DEBUG) Log.d(TAG, "onCharacteristicRead");
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(INTENT_ACTION_DATA_AVAILABLE, characteristic);
-            }
-        }
-
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            if (DEBUG) Log.d(TAG, "incoming data");
-            //parse and write to file
-            final byte[] rawSensorData = characteristic.getValue();
-            processSample(rawSensorData);
-            //FIXME: writing to file seems to cause ART to suspend all threads multiple times
-
-        }
-    };
-
-
-    private void broadcastUpdate(final String intentAction) {
-        final Intent intent = new Intent(intentAction);
-        sendBroadcast(intent);
-    }
-
-    private void broadcastUpdate(final String intentAction, final BluetoothGattCharacteristic characteristic) {
-        final Intent intent = new Intent(intentAction);
-
-        if (SensorStore.isNRFUartReadCharacteristic(characteristic)) {
-            byte[] data = characteristic.getValue();
-            intent.putExtra(INTENT_ACTION_EXTRA_DATA, data);
-        }
-        sendBroadcast(intent);
-    }
 
 
     public void setCharacteristicNotificationNRFUartTX(boolean enabled) {
-        Log.i(TAG, "setCharacteristicNotificationNRFUartTX enabled: " + enabled);
-
-        BluetoothGattService nRFUartService = mBluetoothGatt.getService(SensorStore.getInstance().NRF_UART_SERVICE_UUID);
+        Log.i(this.getClass().getSimpleName(), "setCharacteristicNotificationNRFUartTX enabled: " + enabled);
+        final Intent         blueIntent     = new Intent();
+        BluetoothGattService nRFUartService = mBluetoothGatt.getService(SensorStore.NRF_UART_SERVICE_UUID);
         if (nRFUartService == null) {
-            Log.w(TAG, "nRFUartService not found");
-            broadcastUpdate(INTENT_DEVICE_DOES_NOT_SUPPORT_UART);
+            Log.w(this.getClass().getSimpleName(), "nRFUartService not found");
+            blueIntent.setAction(TAG + INTENT_DEVICE_DOES_NOT_SUPPORT_UART);
+            blueIntent.putExtra("sensor", id);
+            superContext.sendBroadcast(blueIntent);
             return;
         }
-        BluetoothGattCharacteristic nRFUartTXCharacteristic = nRFUartService.getCharacteristic(SensorStore.getInstance().NRF_UART_TX_UUID);
+        BluetoothGattCharacteristic nRFUartTXCharacteristic = nRFUartService.getCharacteristic(SensorStore.NRF_UART_TX_UUID);
         if (nRFUartTXCharacteristic == null) {
-            Log.w(TAG, "nRFUartTXCharacteristic not found");
-            broadcastUpdate(INTENT_DEVICE_DOES_NOT_SUPPORT_UART);
+            Log.w(this.getClass().getSimpleName(), "nRFUartTXCharacteristic not found");
+            blueIntent.setAction(TAG + INTENT_DEVICE_DOES_NOT_SUPPORT_UART);
+            blueIntent.putExtra("sensor", id);
+            superContext.sendBroadcast(blueIntent);
             return;
         }
-        BluetoothGattDescriptor descriptor = nRFUartTXCharacteristic.getDescriptor(SensorStore.getInstance().CLIENT_CHARACTERISTIC_CONFIGURATION_DESCRIPTOR);
+        BluetoothGattDescriptor descriptor = nRFUartTXCharacteristic.getDescriptor(SensorStore.CLIENT_CHARACTERISTIC_CONFIGURATION_DESCRIPTOR);
         if (enabled) {
             mBluetoothGatt.setCharacteristicNotification(nRFUartTXCharacteristic, true);
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
@@ -336,6 +293,52 @@ public class Sensor extends Service {
 
     public String getName() {
 
-        return mBluetoothDeviceAddress;
+        return device.getName();
     }
+
+    public void disconnect() {
+        if (mBluetoothGatt == null) {
+            return;
+        }
+
+        mBluetoothGatt.disconnect();
+    }
+
+    public boolean connectSensorGATT(BluetoothDevice device) {
+        if (device == null) {
+            //noSensor
+            return false;
+        }
+
+        if (device != null && device.equals(this.device) && mBluetoothGatt != null) {
+            mBluetoothGatt.connect();
+
+            return true;
+        }
+
+        mBluetoothGatt = device.connectGatt(superContext, false, mGattCallback);
+        return true;
+    }
+
+    public void close(Sensor toClose) {
+        if (toClose.mBluetoothGatt == null) return;
+        toClose.device = null;
+        toClose.mBluetoothGatt.close();
+        toClose.mBluetoothGatt = null;
+    }
+
+    public enum CHART_TYPE {
+        ACCELERATION,
+        ROTATION,
+        COMPASS
+    }
+
+
+    public enum CONNECTED_STATE {
+        DISCONNECTED,
+        CONNECTING,
+        CONNECTED;
+    }
+
+
 }
