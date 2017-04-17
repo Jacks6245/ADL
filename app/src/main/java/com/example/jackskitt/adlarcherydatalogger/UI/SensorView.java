@@ -2,6 +2,7 @@ package com.example.jackskitt.adlarcherydatalogger.UI;
 
 import android.app.Fragment;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.view.LayoutInflater;
@@ -11,8 +12,11 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.example.jackskitt.adlarcherydatalogger.Collection.FileManager;
+import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 import com.example.jackskitt.adlarcherydatalogger.R;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
 import com.github.mikephil.charting.charts.LineChart;
@@ -92,9 +96,28 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
 
         recordToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (Profile.instance != null) {
 
-                MainActivity.getInstance().store.setCollectData(isChecked);
-
+                    MainActivity.getInstance().store.setCollectData(isChecked);
+                    //if the recording has  changed from on to off
+                    if (!isChecked) {
+                        if (Profile.instance != null) {
+                            //async task to save the  store
+                            new AsyncTask<Void, Void, Void>() {
+                                @Override
+                                protected Void doInBackground(Void... params) {
+                                    if (Profile.instance.profileCurrentSequence.getSizeOfSet() > 0) {
+                                        FileManager.saveSamples(Profile.instance.profileCurrentSequence);
+                                        Profile.instance.newSequence();
+                                    }
+                                    return null;
+                                }
+                            }.execute();
+                        }
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "You must load or create a profile first", Toast.LENGTH_LONG).show();
+                }
             }
         });
 

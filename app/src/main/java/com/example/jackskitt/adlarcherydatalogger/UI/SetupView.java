@@ -16,37 +16,49 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.jackskitt.adlarcherydatalogger.Adapters.BluetoothSensorsListAdapter;
+import com.example.jackskitt.adlarcherydatalogger.Adapters.ProfileLoadAdapter;
+import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 import com.example.jackskitt.adlarcherydatalogger.R;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.SensorStore;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 /**
  * Created by Jack Skitt on 04/04/2017.
  */
 
 public class SetupView extends Fragment {
+
     private ListView                    bluetoothList;
+    private ListView                    profileList;
     private BluetoothSensorsListAdapter listAdapter;
+    private ProfileLoadAdapter          profileAdapter;
     private BluetoothLeScanner          bluetoothScanner;
     private ScanSettings                settings;
     private BluetoothDevice             selectedDevice;
 
     private Button bowConnect;
     private Button gloveConnect;
+    private Button bowDisconnect;
+    private Button gloveDisconnect;
     private Button scanButton;
+
+    private Button newProfileButton;
+    private Button loadProfileButton;
+
+    private EditText newProfileEntry;
 
     private TextView bowConnectionText;
 
     private TextView gloveConnectionText;
-
-    private Handler threadHandler;
-
+    private TextView profileText;
+    private String   selectedProfile;
+    private Handler  threadHandler;
     private boolean      isScanning       = false;
     private ScanCallback scanningCallback = new ScanCallback() {
         @Override
@@ -63,13 +75,27 @@ public class SetupView extends Fragment {
         View view = inflater.inflate(R.layout.fragment_setup, container, false);
         setupBluetooth();
 
+        threadHandler = new Handler();
+
+
         bowConnect = (Button) view.findViewById(R.id.bowSensorConnect);
         gloveConnect = (Button) view.findViewById(R.id.gloveSensor);
+        bowDisconnect = (Button) view.findViewById(R.id.bowSensorDisconnect);
+        gloveDisconnect = (Button) view.findViewById(R.id.gloveDisconnect);
+
         scanButton = (Button) view.findViewById(R.id.scanbutton);
+        newProfileButton = (Button) view.findViewById(R.id.buttonNewProfile);
+        loadProfileButton = (Button) view.findViewById(R.id.buttonLoadProfile);
 
         bowConnectionText = (TextView) view.findViewById(R.id.bowSensorText);
         gloveConnectionText = (TextView) view.findViewById(R.id.gloveSensorText);
+        profileText = (TextView) view.findViewById(R.id.profileText);
+        bluetoothList = (ListView) view.findViewById(R.id.sensorsList);
 
+        newProfileEntry = (EditText) view.findViewById(R.id.profileInput);
+
+
+        profileList = (ListView) view.findViewById(R.id.profileList);
         bowConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,6 +122,25 @@ public class SetupView extends Fragment {
                 }
             }
         });
+
+
+        bowDisconnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.getInstance().store.sensors[0].disconnect();
+                bowConnectionText.setText("Bow Sensor: ");
+            }
+        });
+
+        gloveDisconnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.getInstance().store.sensors[1].disconnect();
+                gloveConnectionText.setText("Bow Sensor: ");
+            }
+        });
+
+
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,13 +148,9 @@ public class SetupView extends Fragment {
             }
         });
 
-
-        bluetoothList = (ListView) view.findViewById(R.id.sensorsList);
         listAdapter = new BluetoothSensorsListAdapter(getActivity());
 
         bluetoothList.setAdapter(listAdapter);
-
-        threadHandler = new Handler();
 
         bluetoothList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -120,6 +161,39 @@ public class SetupView extends Fragment {
 
             }
         });
+
+        profileAdapter = new ProfileLoadAdapter(getActivity());
+        profileList.setAdapter(profileAdapter);
+        profileList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedProfile = profileAdapter.getProfileName(position);
+                loadProfileButton.setEnabled(true);
+
+            }
+        });
+        newProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Profile(newProfileEntry.getText().toString());
+                profileText.setText("Profile: " + Profile.instance.name);
+            }
+        });
+        loadProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedProfile != null) {
+
+                    Profile tempProfile = new Profile(selectedProfile);
+                    tempProfile.loadProfile(selectedProfile);
+                    profileText.setText("Profile: " + Profile.instance.name);
+                }
+            }
+        });
+
+
         scan();
         return view;
 
@@ -152,5 +226,6 @@ public class SetupView extends Fragment {
         settings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_BALANCED).build();
 
     }
+
 
 }

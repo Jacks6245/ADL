@@ -18,6 +18,7 @@ import android.util.Log;
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sequence;
 import com.example.jackskitt.adlarcherydatalogger.Math.MathHelper;
+import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 import com.example.jackskitt.adlarcherydatalogger.UI.SensorView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -38,8 +39,8 @@ public class Sensor {
     public final static String INTENT_ACTION_DATA_DISPLAY             = "INTENT_ACTION_DATA_DISPLAY";
 
     private final static String TAG = "com.example.jackskitt.adlarcherydatalogger.";
-    ;
-    public boolean    collectData;
+
+    public boolean collectData = false;
     public int        id;
     public SensorView chartViewReference;
     public LineChart[] charts = new LineChart[3];
@@ -133,12 +134,13 @@ public class Sensor {
         for (LineChart chart : charts) {
             chart.setData(new LineData());
         }
-        Sequence.getInstance().sequenceData[id].clear();
+        if (Profile.instance != null)
+            Profile.instance.profileCurrentSequence.sequenceData[id].clear();
     }
 
     //TODO: this needs to be in the sensor thread
     public void processSample(byte[] sampleData) {
-        if (collectData) {
+
             if (sampleData != null) {
 
                 Sample sample = getSample(sampleData);
@@ -154,13 +156,15 @@ public class Sensor {
                 //         Sequence.getInstance().sequenceData[id].addSample(sample);
                 //   }
 
-
+                if (Profile.instance != null && collectData) {
+                    Profile.instance.profileCurrentSequence.sequenceData[id].addSample(sample);
+                }
                 addSampleToChart(sample);
 
 
 
             }
-        }
+
     }
 
     public void addSampleToChart(Sample sampleToAdd) {
@@ -245,13 +249,13 @@ public class Sensor {
         float my = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.MY_HI_POSITION, MathHelper.MY_LO_POSITION);
         float mz = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.MZ_HI_POSITION, MathHelper.MZ_LO_POSITION);
 
-        float qw = 0;
+
         float qx = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.GX_HI_POSITION, MathHelper.GX_LO_POSITION);
         float qy = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.GY_HI_POSITION, MathHelper.GY_LO_POSITION);
         float qz = MathHelper.getDataFromBytesAsSInt(buffer, MathHelper.GZ_HI_POSITION, MathHelper.GZ_LO_POSITION);
 
         long time = MathHelper.getSequence(buffer, MathHelper.T0_SEQ0_POSITION);
-        return new Sample(qx, qy, qz, qw, Ax, Ay, Az, mx, my, mz, time);
+        return new Sample(qx, qy, qz, Ax, Ay, Az, mx, my, mz, time);
 
     }
 
@@ -302,6 +306,7 @@ public class Sensor {
         }
 
         mBluetoothGatt.disconnect();
+        close();
     }
 
     public boolean connectSensorGATT(BluetoothDevice device) {
@@ -320,11 +325,11 @@ public class Sensor {
         return true;
     }
 
-    public void close(Sensor toClose) {
-        if (toClose.mBluetoothGatt == null) return;
-        toClose.device = null;
-        toClose.mBluetoothGatt.close();
-        toClose.mBluetoothGatt = null;
+    public void close() {
+        if (mBluetoothGatt == null) return;
+        device = null;
+        mBluetoothGatt.close();
+        mBluetoothGatt = null;
     }
 
     public enum CHART_TYPE {

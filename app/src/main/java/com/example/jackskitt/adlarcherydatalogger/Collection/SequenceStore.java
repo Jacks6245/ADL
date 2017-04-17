@@ -1,5 +1,8 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
+import com.example.jackskitt.adlarcherydatalogger.Adapters.ProfileListValue;
+
+import java.io.File;
 import java.util.ArrayList;
 
 public class SequenceStore {
@@ -17,13 +20,21 @@ public class SequenceStore {
 
     public SequenceStore() {
 
+
     }
 
+    public void createStore(String user) {
+        getAllLogs(user);
+        // createAverageSequence();
+        //getAverageMax();
+        //getAverageMin();
+
+    }
     public void getAllLogs(String user) {
-        Object[] fileNames = FileManager.findAllFilesForUser(user, "./data").toArray();
-        int      numSeq    = 0;
-        for (Object file : fileNames) {
-            Sequence tempSeq = FileManager.readFile((String) file);
+        File[] fileNames = FileManager.findAllFilesForUser(user);
+        int    numSeq    = 0;
+        for (File file : fileNames) {
+            Sequence tempSeq = FileManager.readFile(file);
             if (tempSeq.sequenceData[1].equals(null)) {
                 numSensors = 1;
             }

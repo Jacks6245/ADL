@@ -6,13 +6,19 @@ import java.util.ArrayList;
 
 public class SampleStorage {
 
-    public ArrayList<Marker> markers = new ArrayList<Marker>();
+    public ArrayList<Marker> getMarkers() {
+        return markers;
+    }
+
+    private ArrayList<Marker> markers = new ArrayList<Marker>();
     public Sensor sensorRef;
     public String sensorName;
+    public String sensorAddress;
     public int    sensorID;
     public long   lengthOfSample;
     public int    listSize;
-    private ArrayList<Sample> samples = new ArrayList<Sample>();
+    public  int               sizeOfDataset = 0;
+    private ArrayList<Sample> samples       = new ArrayList<Sample>();
 
     public SampleStorage(Sensor sensor) {
         // TODO Auto-generated constructor stub
@@ -31,7 +37,9 @@ public class SampleStorage {
     }
 
     public long getTimeDifference() {
-        lengthOfSample = samples.get(samples.size() - 1).time - samples.get(0).time;
+        if (samples.size() > 0) {
+            lengthOfSample = samples.get(samples.size() - 1).time - samples.get(0).time;
+        }
         return lengthOfSample;
 
     }

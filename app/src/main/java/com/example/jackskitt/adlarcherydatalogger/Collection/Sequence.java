@@ -1,23 +1,38 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
+import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
+import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
+
 public class Sequence {
 
-    private static Sequence instance;
 
     //A sequence is a store of multiple senors
-    public SampleStorage[] sequenceData = new SampleStorage[2];
+    public SampleStorage[] sequenceData;
 
-    public String userName;
-    public int    sequenceID;
+
+    public int sequenceID;
+
+    public boolean saved = false;
 
     public Sequence() {
 
+        sequenceData = new SampleStorage[2];
+        populateSequenceData();
     }
 
-    public static Sequence getInstance() {
-        if (instance == null) {
-            instance = new Sequence();
+    private void populateSequenceData() {
+        for (Sensor s : MainActivity.getInstance().store.sensors) {
+            sequenceData[s.id] = new SampleStorage(s);
         }
-        return instance;
     }
+
+    public int getSizeOfSet() {
+        int total = 0;
+        for (SampleStorage s : sequenceData) {
+            total += s.getSamples().size();
+        }
+        return total;
+    }
+
+
 }

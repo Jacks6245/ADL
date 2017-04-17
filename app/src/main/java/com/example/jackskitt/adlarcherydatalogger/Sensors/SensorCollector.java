@@ -13,7 +13,6 @@ public class SensorCollector {
 
     Sensor sensorPointer;
 
-    public Vector3 cal = new Vector3();
     public Averager data;
 
     private int AVERGE_COUNT = 10;

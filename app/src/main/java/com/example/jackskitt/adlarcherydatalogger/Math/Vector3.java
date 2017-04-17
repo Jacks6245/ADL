@@ -67,10 +67,13 @@ public class Vector3 extends Point3d {
         switch (i) {
             case 0:
                 x = value;
+                break;
             case 1:
                 y = value;
+                break;
             case 2:
                 z = value;
+                break;
         }
     }
 }

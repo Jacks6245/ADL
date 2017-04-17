@@ -9,60 +9,32 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.Process;
 import android.util.Log;
 
-import com.example.jackskitt.adlarcherydatalogger.Collection.Sequence;
 import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
 
 import java.util.UUID;
 
 
 public class SensorStore extends Service {
-    public enum SENSORTYPE {
-        BOW,
-        GLOVE
-    }
-
-    ;
     //these are the UDIDs used by the firmware
     public final static UUID DEVICE_INFORMATION_SERVICE_UUID = UUID.fromString("0000180A-0000-1000-8000-00805F9B43FB");
-    public final static UUID MANUFACTURER_NAME_UUID          = UUID.fromString("00002A00-0000-1000-8000-00805F9B43FB");
 
+    ;
+    public final static UUID        MANUFACTURER_NAME_UUID = UUID.fromString("00002A00-0000-1000-8000-00805F9B43FB");
     public final static UUID BATTERY_SERVICE_UUID = UUID.fromString("0000180F-0000-1000-8000-00805F9B43FB");
     public final static UUID BATTERY_LEVEL_UUID   = UUID.fromString("00002A19-0000-1000-8000-00805F9B43FB");
-
     public final static UUID NRF_UART_SERVICE_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
     public final static UUID NRF_UART_RX_UUID      = UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"); //write without response
     public final static UUID NRF_UART_TX_UUID      = UUID.fromString("6E400003-B5A3-F393-E0A9-E50E24DCCA9E"); //notify
-
     public final static UUID DFU_SERVICE = UUID.fromString("00001530-1212-EFDE-1523-785FEABCD123");
-
     //universal for Notify or Indicate types of characteristics
     public final static UUID CLIENT_CHARACTERISTIC_CONFIGURATION_DESCRIPTOR = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-
-    private static SensorStore instance;
     private final IBinder  mBinder = new LocalBinder();
     // open accessibility for tests
     public        Sensor[] sensors = new Sensor[2];
-
-    public int              numSensors;
-    public BluetoothAdapter bluetoothAdapter;
-
-    public void setCollectData(boolean collectData) {
-        for (Sensor s : sensors) {
-            s.chartViewReference.recordToggle.setChecked(collectData);
-        }
-
-        this.collectData = collectData;
-    }
-
-    private boolean collectData = false;
-
-
     private final BroadcastReceiver mGattStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -101,6 +73,9 @@ public class SensorStore extends Service {
 
         }
     };
+    public int              numSensors;
+    public BluetoothAdapter bluetoothAdapter;
+    private boolean collectData = false;
 
     public static boolean isDevceInformationService(final BluetoothGattService service) {
         return service != null && SensorStore.DEVICE_INFORMATION_SERVICE_UUID.equals(service.getUuid());
@@ -128,6 +103,27 @@ public class SensorStore extends Service {
 
     public static boolean isNRFUartReadCharacteristic(final BluetoothGattCharacteristic characteristic) {
         return characteristic != null && SensorStore.NRF_UART_TX_UUID.equals(characteristic.getUuid());
+    }
+
+    private static IntentFilter gattActionIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Sensor.INTENT_ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(Sensor.INTENT_ACTION_EXTRA_DATA);
+        intentFilter.addAction(Sensor.INTENT_ACTION_GATT_CONNECTED);
+        intentFilter.addAction(Sensor.INTENT_ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(Sensor.INTENT_ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(Sensor.INTENT_DEVICE_DOES_NOT_SUPPORT_UART);
+        intentFilter.addAction(Sensor.INTENT_ACTION_DATA_DISPLAY);
+        return intentFilter;
+    }
+
+    public void setCollectData(boolean collectData) {
+        for (Sensor s : sensors) {
+            s.chartViewReference.recordToggle.setChecked(collectData);
+            s.collectData = collectData;
+        }
+        this.collectData = collectData;
+
     }
 
     public void createBlankSensors() {
@@ -169,7 +165,14 @@ public class SensorStore extends Service {
             s.disconnect();
         }
         unregisterReceiver(mGattStatusReceiver);
+        disconnectAllSensors();
         return super.onUnbind(intent);
+    }
+
+    private void disconnectAllSensors() {
+        for (Sensor s : sensors) {
+            s.disconnect();
+        }
     }
 
     //TODO: needs to be in a seperate thread possibly aync task
@@ -188,8 +191,6 @@ public class SensorStore extends Service {
                 }
                 if (remoteSensor.connectSensorGATT(address)) {
 
-                    remoteSensor.collectData = true;
-
                     remoteSensor.id = numSensors;
 
                     Log.i(address.getAddress(), "CONNECTED");
@@ -204,22 +205,15 @@ public class SensorStore extends Service {
 
     }
 
-    private static IntentFilter gattActionIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Sensor.INTENT_ACTION_DATA_AVAILABLE);
-        intentFilter.addAction(Sensor.INTENT_ACTION_EXTRA_DATA);
-        intentFilter.addAction(Sensor.INTENT_ACTION_GATT_CONNECTED);
-        intentFilter.addAction(Sensor.INTENT_ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(Sensor.INTENT_ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(Sensor.INTENT_DEVICE_DOES_NOT_SUPPORT_UART);
-        intentFilter.addAction(Sensor.INTENT_ACTION_DATA_DISPLAY);
-        return intentFilter;
+    public enum SENSORTYPE {
+        BOW,
+        GLOVE
     }
 
     public class LocalBinder extends Binder {
         public SensorStore getService() {
             return SensorStore.this;
-    }
+        }
     }
 
 

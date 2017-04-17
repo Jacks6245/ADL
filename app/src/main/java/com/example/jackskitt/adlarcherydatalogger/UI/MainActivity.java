@@ -64,6 +64,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         this.stopService(new Intent(getBaseContext(), SensorStore.class));
 
     }
