@@ -51,4 +51,13 @@ public class MathHelper {
         if (i > 32767) i -= 65536;
         return i;
     }
+
+    public static double calculateMean(double[] set) {
+        double total = 0;
+        for (double value : set) {
+            total += value;
+        }
+        return (total / set.length);
+    }
+
 }

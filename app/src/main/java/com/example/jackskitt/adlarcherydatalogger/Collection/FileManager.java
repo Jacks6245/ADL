@@ -125,7 +125,7 @@ public class FileManager {
         return null;
     }
 
-    private static Sample filterResults(String line) {
+    public static Sample filterResults(String line) {
         String values[] = line.split(",");
         return new Sample(values);
     }
