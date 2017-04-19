@@ -157,7 +157,7 @@ public class Sensor {
                 //   }
 
                 if (Profile.instance != null && collectData) {
-                    Profile.instance.profileCurrentSequence.sequenceData[id].addSample(sample);
+                    Profile.instance.profileCurrentSequence.addSample(id, sample);
                 }
                 addSampleToChart(sample);
 

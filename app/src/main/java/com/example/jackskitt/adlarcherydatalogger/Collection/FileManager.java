@@ -65,9 +65,9 @@ public class FileManager {
         // builds a header for the s ensor, having it's id, port number and
         // length
         builder.append("#" + s.sensorRef.mBluetoothGatt.getDevice().getName() + "," + s.sensorRef.id + "," + s.sensorRef.mBluetoothGatt.getDevice() + "," + s.getTimeDifference() + "\n");
-        if (s.getMarkers() != null)
-            for (Marker a : s.getMarkers()) {
-                builder.append("?" + a.startTime + "," + a.endTime + "," + a.note + "\n");
+        if (s.getEvents() != null)
+            for (Event a : s.getEvents()) {
+                builder.append("?" + a.startTime + "," + a.endTime + "," + a.probability + "," + a.eventType.name() + "\n");
             }
         if (s.getSamples() != null) {
             for (Sample a : s.getSamples()) {
@@ -87,8 +87,8 @@ public class FileManager {
                 reader = new BufferedReader(new FileReader(file));
 
                 String line;
-
-                Sequence tempSequence = new Sequence();
+//temp change bacck
+                Sequence tempSequence = Profile.instance.sequenceStore.allSequences.get(Profile.instance.sequenceStore.allSequences.size() - 1);
                 int      sensorIndex  = -1;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith("$")) {
@@ -104,9 +104,9 @@ public class FileManager {
                         tempSequence.sequenceData[sensorIndex].lengthOfSample = Long.parseLong(values[3]);
                     } else if (line.startsWith("?")) {// markers
                         String[] values = line.split(",");
-                        tempSequence.sequenceData[sensorIndex].getMarkers().add(filterMarkers(line));
+                        tempSequence.sequenceData[sensorIndex].getEvents().add(filterMarkers(line));
                     } else {
-                        tempSequence.sequenceData[sensorIndex].addSample(filterResults(line));
+                        tempSequence.addSample(sensorIndex, filterResults(line));
                     }
                 }
                 return tempSequence;
@@ -130,10 +130,10 @@ public class FileManager {
         return new Sample(values);
     }
 
-    private static Marker filterMarkers(String line) {
+    private static Event filterMarkers(String line) {
         String values[] = line.split(",");
         values[0] = values[0].substring(1);
-        return new Marker(values);
+        return new Event(values);
     }
 
     public static File[] findAllFilesForUser(String name) {

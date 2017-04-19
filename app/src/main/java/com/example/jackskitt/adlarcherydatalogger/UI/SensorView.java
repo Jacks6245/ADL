@@ -36,6 +36,7 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
     public Sensor.CHART_TYPE chartType = Sensor.CHART_TYPE.ACCELERATION;
 
     public  TextView     title;
+    public  TextView     confidence;
     public  ToggleButton recordToggle;
     public  ToggleButton averageToggle;
     public  Button       resetButton;
@@ -200,6 +201,9 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
 
     }
 
+    public void setConfidence(double value) {
+        confidence.setText(value + "");
+    }
 
     @Override
     public void onValueSelected(Entry e, Highlight h) {

@@ -34,11 +34,13 @@ public class SequenceStore {
         File[] fileNames = FileManager.findAllFilesForUser(user);
         int    numSeq    = 0;
         for (File file : fileNames) {
-            Sequence tempSeq = FileManager.readFile(file);
+            Sequence tempSeq = new Sequence();
+            allSequences.add(tempSeq);
+            FileManager.readFile(file);
             if (tempSeq.sequenceData[1].equals(null)) {
                 numSensors = 1;
             }
-            allSequences.add(tempSeq);
+            //   allSequences.add(tempSeq);
         }
 
         System.out.println("Sequences printed: " + numSeq);
@@ -60,7 +62,7 @@ public class SequenceStore {
                     averageSample = Sample.add(averageSample, allSequences.get(o).sequenceData[n].getSamples().get(i));
                 }
                 averageSample = Sample.divideScalar(averageSample, allSequences.size());
-                average.sequenceData[n].addSample(averageSample);
+                average.addSample(n, averageSample);
 
             }
         }

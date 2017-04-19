@@ -6,11 +6,11 @@ import java.util.ArrayList;
 
 public class SampleStorage {
 
-    public ArrayList<Marker> getMarkers() {
-        return markers;
+    public ArrayList<Event> getEvents() {
+        return events;
     }
 
-    private ArrayList<Marker> markers = new ArrayList<Marker>();
+    private ArrayList<Event> events = new ArrayList<Event>();
     public Sensor sensorRef;
     public String sensorName;
     public String sensorAddress;
@@ -29,7 +29,7 @@ public class SampleStorage {
         return samples;
     }
 
-    public void addSample(Sample toAdd) {
+    public void saveSample(Sample toAdd) {
         if (toAdd != null) {
             samples.add(toAdd);
             listSize = samples.size();
@@ -50,7 +50,7 @@ public class SampleStorage {
     }
 
     public void clear() {
-        markers.clear();
+        events.clear();
         lengthOfSample = 0;
         listSize = 0;
         samples.clear();

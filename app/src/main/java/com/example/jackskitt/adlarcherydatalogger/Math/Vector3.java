@@ -35,7 +35,6 @@ public class Vector3 extends Point3d {
 
     public static Vector3 subtract(Vector3 a, Vector3 b) {
         return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
-
     }
 
     public static boolean greaterThan(Vector3 a, Vector3 b) {
@@ -74,6 +73,7 @@ public class Vector3 extends Point3d {
             case 2:
                 z = value;
                 break;
+
         }
     }
 }

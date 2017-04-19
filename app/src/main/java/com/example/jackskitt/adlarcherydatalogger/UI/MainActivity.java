@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
 import com.example.jackskitt.adlarcherydatalogger.Adapters.TabViewAdapter;
+import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
 import com.example.jackskitt.adlarcherydatalogger.R;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.SensorStore;
 
@@ -36,7 +37,10 @@ public class MainActivity extends FragmentActivity {
         viewPage = (ViewPager) findViewById(R.id.pager);
         viewPage.setAdapter(new TabViewAdapter(getFragmentManager(),
                 MainActivity.this));
+
         this.bindService(new Intent(getApplicationContext(), SensorStore.class), mConnection, Context.BIND_AUTO_CREATE);
+        //create the templateStore;
+        new TemplateStore();
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
         tabLayout.setupWithViewPager(viewPage);

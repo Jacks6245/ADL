@@ -1,9 +1,5 @@
 package com.example.jackskitt.adlarcherydatalogger.Math;
 
-import android.util.Log;
-
-import java.nio.ByteBuffer;
-
 public class MathHelper {
     public static final int AX_HI_POSITION   = 0;
     public static final int AX_LO_POSITION   = 1;
@@ -58,6 +54,43 @@ public class MathHelper {
             total += value;
         }
         return (total / set.length);
+    }
+
+    public static double calculateVariance(double[] samples, double mean) {
+        double variance = 0;
+        for (double s : samples) {
+            variance += (s - mean) * (s - mean);
+        }
+        return variance;
+    }
+
+    public static double calculateStdDeviation(double[] samples, double mean) {
+        double stdDeviation = 0;
+        for (double s : samples) {
+            stdDeviation += Math.pow(s - mean, 2);
+        }
+        return Math.sqrt(stdDeviation / (samples.length - 1));
+    }
+
+    public static double calculateCovariance(double[] setA, double[] setB) {
+        double total = 0;
+        if (setA.length == setB.length) {
+            //allows me to handle the data if there's not enough for a full curve.
+            double aMean = calculateMean(setA);
+            double bMean = calculateMean(setB);
+            for (int i = 0; i < setA.length; i++) {
+                total += (setA[i] - aMean) * (setB[i] - bMean);
+            }
+            //calculate R of the Cross Correlation equation
+            return total / (setA.length);
+        }
+        return 0;
+    }
+
+    private static double calcuateCorrelation(double[] setA, double[] setB) {
+
+
+        return calculateCovariance(setA, setB) / (calculateStdDeviation(setB, calculateMean(setB)) * calculateStdDeviation(setA, calculateMean(setA)));
     }
 
 }
