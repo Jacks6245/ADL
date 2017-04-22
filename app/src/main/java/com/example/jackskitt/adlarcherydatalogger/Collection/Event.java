@@ -1,13 +1,13 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
-import com.example.jackskitt.adlarcherydatalogger.Processing.Template;
+import com.example.jackskitt.adlarcherydatalogger.Processing.PatternMatcher;
 
 public class Event {
 
-    public int                   startTime;
-    public int                   endTime;
-    public double                probability;
-    public Template.TemplateType eventType;
+    public int                         startTime;
+    public int                         endTime;
+    public double                      probability;
+    public PatternMatcher.TemplateType eventType;
 
     //TO:DO need to add a time frame variable as well as the interface to create them.
     public Event(String[] parsing) {

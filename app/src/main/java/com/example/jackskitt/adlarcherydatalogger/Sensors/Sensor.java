@@ -173,7 +173,7 @@ public class Sensor {
             if (currentType == CHART_TYPE.ACCELERATION) {
                 value = sampleToAdd.acce.getValueByNumber(i);
             } else if (currentType == CHART_TYPE.ROTATION) {
-                value = sampleToAdd.quat.getValueByNumber(i + 1);//need to fix this
+                value = sampleToAdd.quat.getValueByNumber(i);//need to fix this
             } else if (currentType == CHART_TYPE.COMPASS) {
                 value = sampleToAdd.magn.getValueByNumber(i);
             }

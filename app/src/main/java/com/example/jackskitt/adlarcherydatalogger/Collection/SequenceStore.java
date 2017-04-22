@@ -1,6 +1,7 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
 import com.example.jackskitt.adlarcherydatalogger.Adapters.ProfileListValue;
+import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class SequenceStore {
         for (File file : fileNames) {
             Sequence tempSeq = new Sequence();
             allSequences.add(tempSeq);
+            TemplateStore.instance.resetTemplate(0);
             FileManager.readFile(file);
             if (tempSeq.sequenceData[1].equals(null)) {
                 numSensors = 1;

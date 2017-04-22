@@ -13,6 +13,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
 import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
 
 import java.util.UUID;
@@ -118,10 +119,12 @@ public class SensorStore extends Service {
     }
 
     public void setCollectData(boolean collectData) {
+        TemplateStore.instance.resetTemplate(0);
         for (Sensor s : sensors) {
             s.chartViewReference.recordToggle.setChecked(collectData);
             s.collectData = collectData;
         }
+
         this.collectData = collectData;
 
     }

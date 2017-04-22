@@ -108,7 +108,7 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
                                 @Override
                                 protected Void doInBackground(Void... params) {
                                     if (Profile.instance.profileCurrentSequence.getSizeOfSet() > 0) {
-                                        FileManager.saveSamples(Profile.instance.profileCurrentSequence);
+                                        Profile.instance.profileCurrentSequence.saveSamples();
                                         Profile.instance.newSequence();
                                     }
                                     return null;

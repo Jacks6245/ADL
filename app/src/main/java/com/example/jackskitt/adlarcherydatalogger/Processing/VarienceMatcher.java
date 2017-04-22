@@ -5,8 +5,11 @@ package com.example.jackskitt.adlarcherydatalogger.Processing;
  */
 
 public class VarienceMatcher extends EventSearch {
-    public VarienceMatcher(int length, double lowThreshold, double highThreshold) {
+    public VarienceMatcher(int length, float lowThreshold, float highThreshold) {
         correlation = new DeviationDifference(this);
+        this.lengthOfTemplate = length;
+        this.lowThreadhold = lowThreshold;
+        this.highThreshold = highThreshold;
         setType(TemplateType.BOW_SHOT);
     }
 

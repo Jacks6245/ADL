@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.example.jackskitt.adlarcherydatalogger.Adapters.ProfileListValue;
+import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
 import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 
 import java.io.BufferedReader;
@@ -25,26 +26,15 @@ public class FileManager {
 
     //TODO:  update this for android
 
-    private static void doesDirectoryExist() {
+    static void doesDirectoryExist() {
         File tempFile = new File(defaultDirectory);
         if (tempFile.exists()) {
             tempFile.mkdir();
         }
     }
 
-    public static void saveSamples(Sequence sequence) {
-        StringBuilder sb = new StringBuilder();
-        doesDirectoryExist();
-        sb.append("$" + Profile.instance.name + "," + sequence.sequenceID + "\n");
-        for (SampleStorage s : sequence.sequenceData) {
-            if (s.getSamples().size() > 0) {
-                sb.append(encodeSensor(s));
-            }
-        }
-        saveToFile(sequence, sb);
-    }
 
-    private static void saveToFile(Sequence sequence, StringBuilder sb) {
+    static void saveToFile(Sequence sequence, StringBuilder sb) {
         try {
             File file = new File(defaultDirectory, makeProfileFileName(Profile.instance.name, Profile.instance.profileCurrentSequence.sequenceID));
             if (!file.exists()) {
@@ -60,24 +50,7 @@ public class FileManager {
         }
     }
 
-    private static String encodeSensor(SampleStorage s) {
-        StringBuilder builder = new StringBuilder();
-        // builds a header for the s ensor, having it's id, port number and
-        // length
-        builder.append("#" + s.sensorRef.mBluetoothGatt.getDevice().getName() + "," + s.sensorRef.id + "," + s.sensorRef.mBluetoothGatt.getDevice() + "," + s.getTimeDifference() + "\n");
-        if (s.getEvents() != null)
-            for (Event a : s.getEvents()) {
-                builder.append("?" + a.startTime + "," + a.endTime + "," + a.probability + "," + a.eventType.name() + "\n");
-            }
-        if (s.getSamples() != null) {
-            for (Sample a : s.getSamples()) {
-                builder.append(a.toString());
-            }
 
-        }
-
-        return builder.toString();
-    }
 
     //TODO: need to add profile name saving
     public static Sequence readFile(File file) {
@@ -89,6 +62,7 @@ public class FileManager {
                 String line;
 //temp change bacck
                 Sequence tempSequence = Profile.instance.sequenceStore.allSequences.get(Profile.instance.sequenceStore.allSequences.size() - 1);
+                TemplateStore.instance.resetTemplate(0);
                 int      sensorIndex  = -1;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith("$")) {
@@ -109,6 +83,7 @@ public class FileManager {
                         tempSequence.addSample(sensorIndex, filterResults(line));
                     }
                 }
+
                 return tempSequence;
             }
         } catch (FileNotFoundException e) {

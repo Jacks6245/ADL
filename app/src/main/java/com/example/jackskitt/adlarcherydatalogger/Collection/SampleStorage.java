@@ -49,6 +49,12 @@ public class SampleStorage {
         return sensorTime - samples.get(0).time;
     }
 
+    public SampleStorage split(int start, int end) {
+        SampleStorage toReturn = this;
+
+        toReturn.samples = (ArrayList<Sample>) samples.subList(start, end);
+        return toReturn;
+    }
     public void clear() {
         events.clear();
         lengthOfSample = 0;
