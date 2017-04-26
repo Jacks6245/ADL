@@ -1,31 +1,39 @@
-package com.example.jackskitt.adlarcherydatalogger.Processing;
+package com.example.jackskitt.adlarcherydatalogger.Processing.Matchers;
 
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.util.Log;
 
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sequence;
-import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
+import com.example.jackskitt.adlarcherydatalogger.Processing.SimilarityTesters.SimilarityTester;
+import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
 import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
 
 /**
  * Created by Jack Skitt on 22/04/2017.
  */
 
-public class EventSearch {
+public abstract class EventSearch {
 
     public int lengthOfTemplate = 0;
     public int sensorLookupId   = 0;
 
-    public SimilarityTester correlation;
+    public SimilarityTester similarityTester;
     public Sequence         testingSequence;
+    public    String  name           = "";
     protected int     highestRIndex  = 0;
     protected double  highestR       = 0;
     protected float   highThreshold  = 0;
     protected boolean startCountdown = false;
     protected float   lowThreadhold  = 0;
     private TemplateType type;
+
+    public EventSearch(String name) {
+        this.name = name;
+    }
+
 
     public void resetForEvent() {
         startCountdown = false;
@@ -34,6 +42,7 @@ public class EventSearch {
     }
 
     public void setEvent(int start, int end, double confidence) {
+        Log.i("EVENT_FOUND", type.toString() + " : " + start + " : " + end + " : " + confidence);
         try {
             Uri      notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             Ringtone r            = RingtoneManager.getRingtone(MainActivity.getInstance().getApplicationContext(), notification);
@@ -43,28 +52,23 @@ public class EventSearch {
         }
         switch (type) {
             case BOW_DRAW:
-                Profile.instance.profileCurrentSequence.setBowDrawFound(start, end, confidence);
+                testingSequence.setBowDrawFound(start, end, confidence);
+
                 break;
             case BOW_SHOT:
-                Profile.instance.profileCurrentSequence.setBowShotFound(start, end, confidence);
+                testingSequence.setBowShotFound(start, end, confidence);
+                TemplateStore.instance.bowShotindex = end;
                 break;
             case GLOVE_RELEASE:
-                Profile.instance.profileCurrentSequence.setGloveReleaseFound(start, end, confidence);
+                testingSequence.setGloveReleaseFound(start, end, confidence);
                 break;
         }
-
-
     }
+
 
     public void resetTemplate() {
-        correlation.reset();
-
+        similarityTester.reset();
         resetForEvent();
-    }
-
-    public void searchForEvent(double toAdd) {
-
-
     }
 
     //gets the most recent data for the patternMatcher match
@@ -87,6 +91,8 @@ public class EventSearch {
         }
         this.type = type;
     }
+
+    public abstract void searchForEvent(double removedValue);
 
     public enum TemplateType {
         BOW_SHOT,

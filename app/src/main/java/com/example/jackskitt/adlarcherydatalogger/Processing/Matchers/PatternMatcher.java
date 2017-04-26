@@ -1,8 +1,9 @@
-package com.example.jackskitt.adlarcherydatalogger.Processing;
+package com.example.jackskitt.adlarcherydatalogger.Processing.Matchers;
 
 import android.util.Log;
 
 import com.example.jackskitt.adlarcherydatalogger.Math.MathHelper;
+import com.example.jackskitt.adlarcherydatalogger.Processing.SimilarityTesters.CorrelationTester;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -22,47 +23,41 @@ public class PatternMatcher extends EventSearch {
     public double[] samples;
 
     public PatternMatcher(InputStream templateName) {
+        super("PatternMatcher");
         readFile(templateName);
         calculateValues();
-        correlation = new SSD(this);
+        similarityTester = new CorrelationTester(this);
     }
 
     //with this normalisation method, the closer the distance to the mean the more certain it is
-    @Override
     public void searchForEvent(double toAdd) {
-
-        double r = correlation.getSimilarity(toAdd);
+        double r = similarityTester.getSimilarity(toAdd);
 
         if (r < 1) {//deal with overflow errors
 
-            Log.i("Confidence", testingSequence.sequenceID + " : " + correlation.start + " : " + r);
+            Log.i("Confidence", testingSequence.sequenceID + " : " + similarityTester.start + " : " + r);
 
             if (r > highestR) {
-
                 startCountdown = true;
                 highestR = r;
-                highestRIndex = correlation.start;
+                highestRIndex = similarityTester.start;
             }
             if (startCountdown) {
                 //5 samples after the last highest, if  nothing is found trigger event for highest value
-                if (correlation.start > highestRIndex + 5) {
-                    setEvent(highestRIndex, highestRIndex + lengthOfTemplate, highestR);
-                    if (highestR > highThreshold) {
-                        remakeTemplate(highestRIndex);
-                    }
+                if (similarityTester.start > highestRIndex + 5) {
+                    super.setEvent(highestRIndex, highestRIndex + lengthOfTemplate, highestR);
                 }
             }
         } else {
-            Log.i("Confidence ERROR", testingSequence.sequenceID + " : " + correlation.start + " : " + r);
+            Log.i("Confidence ERROR", testingSequence.sequenceID + " : " + similarityTester.start + " : " + r);
         }
-
     }
 
 
     public void remakeTemplate(int start) {
         //add the averages to the model
         for (int i = 0; i < lengthOfTemplate; i++) {
-            samples[i] = (samples[i] + getRemovedValue(correlation.getTestingSet().get(start + i))) / 2;
+            samples[i] = (samples[i] + getRemovedValue(similarityTester.getTestingSet().get(start + i))) / 2;
         }
         calculateValues();
     }
@@ -88,8 +83,9 @@ public class PatternMatcher extends EventSearch {
                     setType(parseType(values[0].substring(1)));
                     lengthOfTemplate = Integer.parseInt(values[1]);
                     samples = new double[lengthOfTemplate];
-                    highThreshold = Float.parseFloat(values[2]);
-                    lowThreadhold = Float.parseFloat(values[3]);
+                    lowThreadhold = Float.parseFloat(values[2]);
+                    highThreshold = Float.parseFloat(values[3]);
+
                     highestR = lowThreadhold;
                 } else {
                     double value = Double.parseDouble(line);

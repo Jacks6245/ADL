@@ -1,6 +1,7 @@
-package com.example.jackskitt.adlarcherydatalogger.Processing;
+package com.example.jackskitt.adlarcherydatalogger.Processing.SimilarityTesters;
 
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
+import com.example.jackskitt.adlarcherydatalogger.Processing.Matchers.EventSearch;
 
 import java.util.ArrayList;
 
@@ -8,16 +9,18 @@ import java.util.ArrayList;
  * Created by Jack Skitt on 21/04/2017.
  */
 
-public class SimilarityTester {
+public abstract class SimilarityTester {
     public    int    start        = 0;
     public    int    end          = 0;
     public    double stdDeviation = 0;
     public    double mean         = 0;
+    public    int    searchStart  = 0;
     protected double addedValue   = 0;
     protected int    count        = 0;
     protected double oldMean      = 0;
     protected double S            = 0;
     protected double variance     = 0;
+
     protected EventSearch patternMatcher;
     protected boolean canRemove = false;
     protected boolean canCount  = false;
@@ -35,37 +38,44 @@ public class SimilarityTester {
         count = 0;
         canCount = false;
         canRemove = false;
-
+        S = 0;
     }
 
-    public double getSimilarity(double addedValue) {
-        this.addedValue = addedValue;
-        updateValues();
-        return 0;
-    }
+    public abstract double getSimilarity(double addedValue);
 
     public void updateValues() {
+
+        if (canCount) {//allows this to be called one iteration after the counting has started
+            canRemove = true;
+        }
         if (count < patternMatcher.lengthOfTemplate) {
             count++;
         }
-        if (getTestingSet().size() - patternMatcher.lengthOfTemplate == 0) {
-            canCount = true;
-        } else if (getTestingSet().size() > patternMatcher.lengthOfTemplate) {
-            canRemove = true;
-        }
+        if (count == patternMatcher.lengthOfTemplate) {
 
+            canCount = true;
+
+        }
+        updateStart();
+    }
+
+    public void updateStart() {
         if (start == getTestingSet().size() - patternMatcher.lengthOfTemplate) {
             start = getTestingSet().size() - patternMatcher.lengthOfTemplate;
         } else if (canRemove) {
             start++;
         } else {
-            start = 0;
+            start = searchStart;
         }
-
         end = start + patternMatcher.lengthOfTemplate;
+    }
+
+    public void updateCalculations() {
         mean = calculateRunningMean();
         stdDeviation = calculateRunningDeviation();
+
     }
+
 
     public ArrayList<Sample> getTestingSet() {
         return patternMatcher.testingSequence.sequenceData[patternMatcher.sensorLookupId].getSamples();
@@ -86,7 +96,7 @@ public class SimilarityTester {
         S += delta * delta2;
 
         //returns the new standard deviation based on the old mean count
-        if (count > 2) {
+        if (count > 1) {
             variance = S / (count - 1);
             return Math.sqrt(variance);
         } else {
@@ -109,11 +119,11 @@ public class SimilarityTester {
     }
 
     private double getValueAtStartToRemove() {
-        return patternMatcher.getRemovedValue(getTestingSet().get((start)));
+        return patternMatcher.getRemovedValue(getTestingSet().get((start - 1)));
     }
 
     public double normalizeMean(double value) {
-        return ((value - mean) / (stdDeviation));
+        return ((value - mean));
     }
 
 }

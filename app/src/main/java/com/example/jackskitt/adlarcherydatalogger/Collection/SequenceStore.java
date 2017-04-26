@@ -97,8 +97,6 @@ public class SequenceStore {
             if (allSequences.get(i).sequenceData[0].listSize < allSequences.get(shortest).sequenceData[0].listSize) {
                 shortest = i;
             }
-
-
         }
         return allSequences.get(shortest);
     }
@@ -114,4 +112,5 @@ public class SequenceStore {
         }
         return allSequences.get(shortest);
     }
+
 }

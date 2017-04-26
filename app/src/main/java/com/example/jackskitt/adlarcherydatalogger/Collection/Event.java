@@ -1,6 +1,6 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
-import com.example.jackskitt.adlarcherydatalogger.Processing.PatternMatcher;
+import com.example.jackskitt.adlarcherydatalogger.Processing.Matchers.PatternMatcher;
 
 public class Event {
 

@@ -72,25 +72,38 @@ public class MathHelper {
         return Math.sqrt(stdDeviation / (samples.length - 1));
     }
 
+    public static double calculateStdDeviation(double[] samples) {
+        double stdDeviation = 0;
+        double mean         = calculateMean(samples);
+        for (double s : samples) {
+            stdDeviation += Math.pow(s - mean, 2);
+        }
+        return Math.sqrt(stdDeviation / (samples.length - 1));
+    }
+
     public static double calculateCovariance(double[] setA, double[] setB) {
         double total = 0;
         if (setA.length == setB.length) {
             //allows me to handle the data if there's not enough for a full curve.
-            double aMean = calculateMean(setA);
+
             double bMean = calculateMean(setB);
-            for (int i = 0; i < setA.length; i++) {
-                total += (setA[i] - aMean) * (setB[i] - bMean);
+            for (int i = 0; i < setA.length - 1; i++) {
+                total += (setA[i]) * (setB[i] - bMean);
             }
-            //calculate R of the Cross Correlation equation
-            return total / (setA.length);
+            //calculate R of the Cross CorrelationTester equation
+            return total / setA.length;
         }
         return 0;
     }
 
-    private static double calcuateCorrelation(double[] setA, double[] setB) {
 
-
-        return calculateCovariance(setA, setB) / (calculateStdDeviation(setB, calculateMean(setB)) * calculateStdDeviation(setA, calculateMean(setA)));
+    public static double calcuateCorrelation(double[] setA, double[] setB) {
+        return calculateCovariance(setA, setB) / (calculateStdDeviation(setA) * calculateStdDeviation(setB));
     }
+
+    public static double calcuateCorrelation(double[] setA, double[] setB, double stdDevA, double stdDivB) {
+        return calculateCovariance(setA, setB) / (stdDevA * stdDivB);
+    }
+
 
 }

@@ -36,7 +36,7 @@ public class FileManager {
 
     static void saveToFile(Sequence sequence, StringBuilder sb) {
         try {
-            File file = new File(defaultDirectory, makeProfileFileName(Profile.instance.name, Profile.instance.profileCurrentSequence.sequenceID));
+            File file = new File(defaultDirectory, makeProfileFileName(Profile.instance.name, sequence.sequenceID));
             if (!file.exists()) {
                 file.createNewFile();
             }
@@ -44,7 +44,7 @@ public class FileManager {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.write(sb.toString());
             writer.close();
-            sequence.saved = true;
+            sequence.processed = true;
         } catch (IOException e) {
             Log.e("IO", e.getMessage());
         }
@@ -62,20 +62,23 @@ public class FileManager {
                 String line;
 //temp change bacck
                 Sequence tempSequence = Profile.instance.sequenceStore.allSequences.get(Profile.instance.sequenceStore.allSequences.size() - 1);
-                TemplateStore.instance.resetTemplate(0);
+                TemplateStore.instance.resetForNewSequence();
                 int      sensorIndex  = -1;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith("$")) {
                         String[] values = line.split(",");
 
                         tempSequence.sequenceID = Integer.parseInt(values[1]);
+
                     } else if (line.startsWith("#")) {
                         String[] values = line.split(",");
                         sensorIndex++;
                         tempSequence.sequenceData[sensorIndex].sensorName = values[0].substring(1);
                         tempSequence.sequenceData[sensorIndex].sensorID = Integer.parseInt(values[1]);// cuts
                         tempSequence.sequenceData[sensorIndex].sensorAddress = values[2];
-                        tempSequence.sequenceData[sensorIndex].lengthOfSample = Long.parseLong(values[3]);
+                        tempSequence.sequenceData[sensorIndex].sizeOfDataset = Integer.parseInt(values[3]);
+                        tempSequence.aimTime = Integer.parseInt(values[4]);
+
                     } else if (line.startsWith("?")) {// markers
                         String[] values = line.split(",");
                         tempSequence.sequenceData[sensorIndex].getEvents().add(filterMarkers(line));
@@ -83,6 +86,9 @@ public class FileManager {
                         tempSequence.addSample(sensorIndex, filterResults(line));
                     }
                 }
+
+                tempSequence.splitSequence();
+                TemplateStore.instance.resetForNewSequence();
 
                 return tempSequence;
             }

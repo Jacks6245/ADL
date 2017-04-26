@@ -42,6 +42,8 @@ public class Sensor {
 
     public boolean collectData = false;
     public int        id;
+    public String sensorAddress = "";
+    public String sensorName    = "";
     public SensorView chartViewReference;
     public LineChart[] charts = new LineChart[3];
     public BluetoothDevice device;
@@ -67,6 +69,8 @@ public class Sensor {
                 blueIntent.setAction(INTENT_ACTION_GATT_CONNECTED);
                 blueIntent.putExtra("sensor", id);
                 superContext.sendBroadcast(blueIntent);
+                sensorAddress = gatt.getDevice().getAddress();
+                sensorName = gatt.getDevice().getName();
                 //       mBluetoothGatt.discoverServices();
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
