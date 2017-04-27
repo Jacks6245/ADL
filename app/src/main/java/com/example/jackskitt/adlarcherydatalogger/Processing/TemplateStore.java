@@ -82,6 +82,7 @@ public class TemplateStore {
         seq.resetEventFlags();
     }
 
+
     public void resetTemplate(int i) {
         patternMatchers[i].resetTemplate();
     }

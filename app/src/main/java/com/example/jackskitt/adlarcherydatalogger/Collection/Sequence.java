@@ -1,5 +1,7 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
+import android.support.annotation.NonNull;
+
 import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
 import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
@@ -7,22 +9,28 @@ import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
 
 import java.util.ArrayList;
 
-public class Sequence {
+public class Sequence implements Comparable<Sequence> {
 
 
+    public static int desiredLength = 500;
     //A sequence is a store of multiple senors
-    public SampleStorage[] sequenceData;
-
+    public SampleStorage[]  sequenceData;
     public ArrayList<Event> drawEvent;
     public ArrayList<Event> shotEvent;
     public ArrayList<Event> splitEvent;
     public int              sequenceID;
-    public  boolean processed         = false;
-    public  int     aimTime           = 0;
+
+    public double bowCovariance    = 0;
+    public double gloveCovariance  = 0;
+    public double bowCorrelation   = 0;
+    public double gloveCorrelation = 0;
+
+    public boolean processed = false;
+    public int     aimTime   = 0;
+    public String date;
     private boolean bowDrawFound      = false;
     private boolean bowShotFound      = false;
     private boolean gloveReleaseFound = false;
-    private int     desiredLength     = 500;
 
     public Sequence() {
 
@@ -40,9 +48,9 @@ public class Sequence {
         }
     }
 
-    public void addSample(int i, Sample value) {
+    public void addSample(int index, Sample value) {
 
-        sequenceData[i].saveSample(value);
+        sequenceData[index].saveSample(value);
     }
 
     public void removeShotFlag() {
@@ -72,6 +80,11 @@ public class Sequence {
     public void resetEventFlags() {
         bowDrawFound = false;
         bowShotFound = false;
+    }
+
+    public void resetSequence() {
+        populateSequenceData();
+
     }
 
     public boolean isBowShotFound() {
@@ -113,7 +126,7 @@ public class Sequence {
                 }
             }
         }
-        Profile.instance.newSequence();
+
     }
 
     //test loading of sequences goes here
@@ -201,4 +214,8 @@ public class Sequence {
         }
     }
 
+    @Override
+    public int compareTo(@NonNull Sequence another) {
+        return (this.sequenceID < another.sequenceID ? -1 : this.sequenceID == another.sequenceID ? 0 : 1);
+    }
 }

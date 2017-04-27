@@ -14,10 +14,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Hashtable;
 
 public class FileManager {
@@ -51,7 +53,6 @@ public class FileManager {
     }
 
 
-
     //TODO: need to add profile name saving
     public static Sequence readFile(File file) {
         BufferedReader reader;
@@ -61,11 +62,13 @@ public class FileManager {
 
                 String line;
 //temp change bacck
-                Sequence tempSequence = Profile.instance.sequenceStore.allSequences.get(Profile.instance.sequenceStore.allSequences.size() - 1);
+                Sequence tempSequence = new Sequence();
+                tempSequence.date = getProfileDate(file.getName());
                 TemplateStore.instance.resetForNewSequence();
-                int      sensorIndex  = -1;
+                int sensorIndex = -1;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith("$")) {
+
                         String[] values = line.split(",");
 
                         tempSequence.sequenceID = Integer.parseInt(values[1]);
@@ -78,6 +81,7 @@ public class FileManager {
                         tempSequence.sequenceData[sensorIndex].sensorAddress = values[2];
                         tempSequence.sequenceData[sensorIndex].sizeOfDataset = Integer.parseInt(values[3]);
                         tempSequence.aimTime = Integer.parseInt(values[4]);
+
 
                     } else if (line.startsWith("?")) {// markers
                         String[] values = line.split(",");
@@ -170,7 +174,21 @@ public class FileManager {
     }
 
     private static String getProfileName(String fileName) {
+
         return fileName.split("_")[0];
+    }
+
+    private static String getProfileDate(String fileName) {
+        String           fileDate    = fileName.split("_")[2];
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
+        Date             tempDate    = null;
+        try {
+            tempDate = inputFormat.parse(fileDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
+        return outputFormat.format(tempDate);
     }
 
     public static String makeProfileFileName(String profileName, int sequenceId) {

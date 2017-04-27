@@ -56,7 +56,7 @@ public class SetupView extends Fragment {
     private TextView bowConnectionText;
 
     private TextView gloveConnectionText;
-    private TextView profileText;
+    public  TextView profileText;
     private String   selectedProfile;
     private Handler  threadHandler;
     private boolean      isScanning       = false;
@@ -82,6 +82,11 @@ public class SetupView extends Fragment {
         gloveConnect = (Button) view.findViewById(R.id.gloveSensor);
         bowDisconnect = (Button) view.findViewById(R.id.bowSensorDisconnect);
         gloveDisconnect = (Button) view.findViewById(R.id.gloveDisconnect);
+
+        bowConnect.setEnabled(false);
+        gloveConnect.setEnabled(false);
+        bowDisconnect.setEnabled(false);
+        gloveDisconnect.setEnabled(false);
 
         scanButton = (Button) view.findViewById(R.id.scanbutton);
         newProfileButton = (Button) view.findViewById(R.id.buttonNewProfile);
@@ -187,8 +192,10 @@ public class SetupView extends Fragment {
                 if (selectedProfile != null) {
 
                     Profile tempProfile = new Profile(selectedProfile);
+                    loadProfileButton.setEnabled(false);
+                    newProfileButton.setEnabled(false);
                     tempProfile.loadProfile(selectedProfile);
-                    profileText.setText("Profile: " + Profile.instance.name);
+
                 }
             }
         });
@@ -210,6 +217,19 @@ public class SetupView extends Fragment {
         }, 10000);
         bluetoothScanner.startScan(new ArrayList<ScanFilter>(), settings, scanningCallback);
         isScanning = true;
+    }
+
+    public void enableConnectButtons() {
+        bowConnect.setEnabled(true);
+        gloveConnect.setEnabled(true);
+        bowDisconnect.setEnabled(true);
+        gloveDisconnect.setEnabled(true);
+    }
+
+    public void enableProfileButtons() {
+        loadProfileButton.setEnabled(true);
+        newProfileButton.setEnabled(true);
+
     }
 
     private void setupBluetooth() {

@@ -1,6 +1,5 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
-import com.example.jackskitt.adlarcherydatalogger.Math.Quaternion;
 import com.example.jackskitt.adlarcherydatalogger.Math.Vector3;
 
 import java.util.Calendar;
@@ -35,6 +34,13 @@ public class Sample {
         setTimeNow();
     }
 
+    public Sample(double qX, double qY, double qZ, double aX, double aY, double aZ, double mX, double mY, double mZ, boolean scale) {
+        setRotation(qX, qY, qZ);
+        setAcceleration(aX, aY, aZ);
+        setCompass(mX, mY, mZ);
+        setTimeNow();
+    }
+
     public Sample(double qX, double qY, double qZ, double aX, double aY, double aZ, double mX, double mY, double mZ, long time) {
         setRotation(qX / scale, qY / scale, qZ / scale);
         setAcceleration(aX / scale, aY / scale, aZ / scale);
@@ -66,12 +72,12 @@ public class Sample {
 
     public static Sample sclarSubtraction(float theta, Sample a) {
         return new Sample(a.quat.x - theta, a.quat.y - theta, a.quat.z - theta, a.acce.x - theta,
-                a.acce.y - theta, a.acce.z - theta, a.magn.x - theta, a.magn.y - theta, a.magn.z - theta);
+                a.acce.y - theta, a.acce.z - theta, a.magn.x - theta, a.magn.y - theta, a.magn.z - theta, true);
     }
 
     public static Sample scalarAddition(float theta, Sample a) {
         return new Sample(a.quat.x + theta, a.quat.y + theta, a.quat.z + theta, a.acce.x + theta,
-                a.acce.y + theta, a.acce.z + theta, a.magn.x + theta, a.magn.y + theta, a.magn.z + theta);
+                a.acce.y + theta, a.acce.z + theta, a.magn.x + theta, a.magn.y + theta, a.magn.z + theta, true);
     }
 
     public static Sample subtract(Sample a, Sample b) {
@@ -93,8 +99,20 @@ public class Sample {
 
     public static Sample divideScalar(Sample a, float theta) {
         return new Sample(a.quat.x / theta, a.quat.y / theta, a.quat.z / theta, a.acce.x / theta,
-                a.acce.y / theta, a.acce.z / theta, a.magn.x / theta, a.magn.y / theta, a.magn.z / theta);
+                a.acce.y / theta, a.acce.z / theta, a.magn.x / theta, a.magn.y / theta, a.magn.z / theta, true);
     }
+
+    public static Sample multiplyScalar(Sample a, float theta) {
+        return new Sample(a.quat.x * theta, a.quat.y * theta, a.quat.z * theta, a.acce.x * theta,
+                a.acce.y * theta, a.acce.z * theta, a.magn.x * theta, a.magn.y * theta, a.magn.z * theta, true);
+    }
+
+
+    public static Sample sqrt(Sample a) {
+        return new Sample(Math.sqrt(a.quat.x), Math.sqrt(a.quat.y), Math.sqrt(a.quat.z), Math.sqrt(a.acce.x),
+                Math.sqrt(a.acce.y), Math.sqrt(a.acce.z), Math.sqrt(a.magn.x), Math.sqrt(a.magn.y), Math.sqrt(a.magn.z), true);
+    }
+
 
     public static boolean greaterThan(Sample a, Sample b) {
         return Vector3.greaterThan(a.quat, b.quat) && Vector3.greaterThan(a.acce, b.acce);
@@ -126,6 +144,19 @@ public class Sample {
         acce = new Vector3(0, 0, 0);
         quat = new Vector3(0, 0, 0);
         magn = new Vector3(0, 0, 0);
+    }
+
+    public double getValueFromIndex(int index) {
+        if (index / 3 == 0) {
+            return quat.getValueByNumber(index - ((index / 3) * 3));
+        }
+        if (index / 3 == 1) {
+            return acce.getValueByNumber(index - ((index / 3) * 3));
+        }
+        if (index / 3 == 2) {
+            return magn.getValueByNumber(index - ((index / 3) * 3));
+        }
+        return 0;
     }
 
     public String toString() {

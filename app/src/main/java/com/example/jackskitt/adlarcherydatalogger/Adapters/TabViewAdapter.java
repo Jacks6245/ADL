@@ -1,12 +1,11 @@
 package com.example.jackskitt.adlarcherydatalogger.Adapters;
 
-import android.app.Application;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.support.v13.app.FragmentPagerAdapter;
 
-import com.example.jackskitt.adlarcherydatalogger.Sensors.SensorStore;
+import com.example.jackskitt.adlarcherydatalogger.UI.AnalysisView;
 import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
 import com.example.jackskitt.adlarcherydatalogger.UI.SensorView;
 import com.example.jackskitt.adlarcherydatalogger.UI.SetupView;
@@ -16,13 +15,15 @@ import com.example.jackskitt.adlarcherydatalogger.UI.SetupView;
  */
 
 public class TabViewAdapter extends FragmentPagerAdapter {
+    public AnalysisView analysisView;
+    public SetupView    setupView;
     private String[] tabNames = {"Setup", "Bow Sensor", "Glove Sensor", "Analysis"};
-
     private Context context;
 
     public TabViewAdapter(FragmentManager fm, MainActivity mainActivity) {
         super(fm);
         this.context = mainActivity;
+        analysisView = new AnalysisView();
     }
 
     @Override
@@ -32,8 +33,8 @@ public class TabViewAdapter extends FragmentPagerAdapter {
         switch (index) {
             case 0:
                 //Setup Activity
-
-                return new SetupView();
+                setupView = new SetupView();
+                return setupView;
 
             case 1:
                 //chart 1
@@ -51,8 +52,7 @@ public class TabViewAdapter extends FragmentPagerAdapter {
             case 3:
                 //analysis
 
-
-                return new SetupView();
+                return analysisView;
 
             default:
                 break;

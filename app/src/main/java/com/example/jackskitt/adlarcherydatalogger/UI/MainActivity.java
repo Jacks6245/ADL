@@ -16,38 +16,12 @@ import com.example.jackskitt.adlarcherydatalogger.R;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.SensorStore;
 
 public class MainActivity extends FragmentActivity {
-    private ViewPager      viewPage;
-    private TabViewAdapter adapter;
-    private TabLayout      tabBar;
-
-    public static  Context      context;
-    private static MainActivity instance;
-    public         SensorStore  store;
+    public static  Context        context;
+    private static MainActivity   instance;
+    public         SensorStore    store;
+    public         TabViewAdapter adapter;
     boolean mBound = false;
-
-    public static synchronized MainActivity getInstance() {
-        return instance;
-    }
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        instance = this;
-        setContentView(R.layout.main_activity);
-        context = getBaseContext();
-        // Get the ViewPager and set it's PagerAdapter so that it can display items
-        viewPage = (ViewPager) findViewById(R.id.pager);
-        viewPage.setAdapter(new TabViewAdapter(getFragmentManager(),
-                MainActivity.this));
-
-        this.bindService(new Intent(getApplicationContext(), SensorStore.class), mConnection, Context.BIND_AUTO_CREATE);
-        //create the templateStore;
-        new TemplateStore();
-        // Give the TabLayout the ViewPager
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
-        tabLayout.setupWithViewPager(viewPage);
-
-
-    }
-
+    private ViewPager viewPage;
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -64,6 +38,30 @@ public class MainActivity extends FragmentActivity {
             mBound = false;
         }
     };
+
+    public static synchronized MainActivity getInstance() {
+        return instance;
+    }
+
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        instance = this;
+        setContentView(R.layout.main_activity);
+        context = getBaseContext();
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        viewPage = (ViewPager) findViewById(R.id.pager);
+        adapter = new TabViewAdapter(getFragmentManager(), MainActivity.this);
+        viewPage.setAdapter(adapter);
+
+        this.bindService(new Intent(getApplicationContext(), SensorStore.class), mConnection, Context.BIND_AUTO_CREATE);
+        //create the templateStore;
+        new TemplateStore();
+        // Give the TabLayout the ViewPager
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
+        tabLayout.setupWithViewPager(viewPage);
+        tabLayout.setNestedScrollingEnabled(true);
+
+    }
 
     @Override
     protected void onDestroy() {

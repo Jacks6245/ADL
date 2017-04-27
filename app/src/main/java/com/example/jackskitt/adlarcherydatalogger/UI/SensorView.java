@@ -91,8 +91,6 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
         viewingSensor.charts[2] = (LineChart) view.findViewById(R.id.chart3);
 
         recordToggle = (ToggleButton) view.findViewById(R.id.recordToggle);
-        averageToggle = (ToggleButton) view.findViewById(R.id.averageToggle);
-
         resetButton = (Button) view.findViewById(R.id.resetButton);
 
         recordToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -113,6 +111,13 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
                                     }
                                     return null;
                                 }
+
+                                @Override
+                                protected void onPostExecute(Void aVoid) {
+                                    Toast.makeText(MainActivity.getInstance().getBaseContext(), "Finished Processing Data", Toast.LENGTH_LONG).show();
+
+                                    Profile.instance.newSequence();
+                                }
                             }.execute();
                         }
                     }
@@ -122,21 +127,12 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
             }
         });
 
-        averageToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    // The toggle is enabled
-                } else {
-                    // The toggle is disabled
-                }
-            }
-        });
-
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (viewingSensor != null) {
                     viewingSensor.restartCharts();
+                    Profile.instance.profileCurrentSequence.resetSequence();
                 }
             }
         });
@@ -197,12 +193,6 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
 
         // add empty data
         chart.setData(data);
-
-
-    }
-
-    public void setConfidence(double value) {
-        confidence.setText(value + "");
     }
 
     @Override

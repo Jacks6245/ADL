@@ -87,13 +87,16 @@ public class MathHelper {
             //allows me to handle the data if there's not enough for a full curve.
 
             double bMean = calculateMean(setB);
+            double aMean = calculateMean(setA);
+
             for (int i = 0; i < setA.length - 1; i++) {
-                total += (setA[i]) * (setB[i] - bMean);
+                total += (setA[i] - aMean) * (setB[i] - bMean);
             }
             //calculate R of the Cross CorrelationTester equation
-            return total / setA.length;
+            return total / (calculateStdDeviation(setA, aMean) * calculateStdDeviation(setB, bMean));
         }
         return 0;
+
     }
 
 
@@ -103,6 +106,10 @@ public class MathHelper {
 
     public static double calcuateCorrelation(double[] setA, double[] setB, double stdDevA, double stdDivB) {
         return calculateCovariance(setA, setB) / (stdDevA * stdDivB);
+    }
+
+    public static double calcuateCorrelation(double coVariance, double length) {
+        return coVariance * (1.0 / length);
     }
 
 
