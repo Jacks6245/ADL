@@ -44,9 +44,7 @@ public abstract class EventSearch {
     public void setEvent(int start, int end, double confidence) {
         Log.i("EVENT_FOUND", type.toString() + " : " + start + " : " + end + " : " + confidence);
         try {
-            Uri      notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone r            = RingtoneManager.getRingtone(MainActivity.getInstance().getApplicationContext(), notification);
-            r.play();
+
         } catch (Exception e) {
             e.printStackTrace();
         }

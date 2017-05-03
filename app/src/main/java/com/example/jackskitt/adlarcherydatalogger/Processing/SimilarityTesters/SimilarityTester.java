@@ -16,14 +16,14 @@ public abstract class SimilarityTester {
     public    double mean         = 0;
     public    int    searchStart  = 0;
     protected double addedValue   = 0;
-    protected int    count        = 0;
+    public    int    count        = 0;
     protected double oldMean      = 0;
     protected double S            = 0;
     protected double variance     = 0;
 
     protected EventSearch patternMatcher;
-    protected boolean canRemove = false;
-    protected boolean canCount  = false;
+    public boolean canRemove = false;
+    public boolean canCount  = false;
 
     public SimilarityTester(EventSearch patternMatcher) {
         this.patternMatcher = patternMatcher;
@@ -97,7 +97,7 @@ public abstract class SimilarityTester {
 
         //returns the new standard deviation based on the old mean count
         if (count > 1) {
-            variance = S / (count - 1);
+            variance = S / (count);
             return Math.sqrt(variance);
         } else {
             variance = 0;
@@ -107,7 +107,7 @@ public abstract class SimilarityTester {
 
     //this is a more efficent method to calculate the mean,
     //this means that it doesn't need to sum all the data each time
-    private double calculateRunningMean() {
+    public double calculateRunningMean() {
         oldMean = mean;
         //need to make sure count is increased before this method is called
         if (canRemove) {
@@ -124,6 +124,10 @@ public abstract class SimilarityTester {
 
     public double normalizeMean(double value) {
         return ((value - mean));
+    }
+
+    public void changeAddedValue(double toChangeTo) {
+        addedValue = toChangeTo;
     }
 
 }

@@ -5,7 +5,7 @@ import com.example.jackskitt.adlarcherydatalogger.Processing.SimilarityTesters.D
 /**
  * Created by Jack Skitt on 23/04/2017.
  */
-
+//This matcher gets the difference between two values and if the value is above a threshold returns a match
 public class DifferenceMatcher extends EventSearch {
     public DifferenceMatcher(float lowThreshold, float highThreshold, TemplateType type) {
         super("Difference_Matcher");

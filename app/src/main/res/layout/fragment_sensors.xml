@@ -81,14 +81,6 @@
             android:textOff="Record"
             android:textOn="Recording" />
 
-        <ToggleButton
-            android:id="@+id/averageToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="ToggleButton"
-            android:textOff="Average"
-            android:textOn="Average" />
     </LinearLayout>
 
     <LinearLayout

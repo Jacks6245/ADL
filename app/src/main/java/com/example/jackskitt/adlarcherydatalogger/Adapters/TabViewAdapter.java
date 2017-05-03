@@ -23,13 +23,14 @@ public class TabViewAdapter extends FragmentPagerAdapter {
     public TabViewAdapter(FragmentManager fm, MainActivity mainActivity) {
         super(fm);
         this.context = mainActivity;
+        //load the analysis view so all the arrays are initalsed at load
         analysisView = new AnalysisView();
     }
 
     @Override
     public Fragment getItem(int index) {
 
-
+//setup the tab index to return the relevant fragments
         switch (index) {
             case 0:
                 //Setup Activity
@@ -39,7 +40,7 @@ public class TabViewAdapter extends FragmentPagerAdapter {
             case 1:
                 //chart 1
                 SensorView tempView = new SensorView();
-
+                //assign the sensors for the view
                 tempView.viewingSensor = MainActivity.getInstance().store.sensors[0];
 
                 return tempView;

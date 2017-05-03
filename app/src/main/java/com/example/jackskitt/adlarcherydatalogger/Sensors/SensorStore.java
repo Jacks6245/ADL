@@ -24,19 +24,19 @@ public class SensorStore extends Service {
     public final static UUID DEVICE_INFORMATION_SERVICE_UUID = UUID.fromString("0000180A-0000-1000-8000-00805F9B43FB");
 
     ;
-    public final static UUID        MANUFACTURER_NAME_UUID = UUID.fromString("00002A00-0000-1000-8000-00805F9B43FB");
-    public final static UUID BATTERY_SERVICE_UUID = UUID.fromString("0000180F-0000-1000-8000-00805F9B43FB");
-    public final static UUID BATTERY_LEVEL_UUID   = UUID.fromString("00002A19-0000-1000-8000-00805F9B43FB");
-    public final static UUID NRF_UART_SERVICE_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
-    public final static UUID NRF_UART_RX_UUID      = UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"); //write without response
-    public final static UUID NRF_UART_TX_UUID      = UUID.fromString("6E400003-B5A3-F393-E0A9-E50E24DCCA9E"); //notify
-    public final static UUID DFU_SERVICE = UUID.fromString("00001530-1212-EFDE-1523-785FEABCD123");
+    public final static UUID              MANUFACTURER_NAME_UUID                         = UUID.fromString("00002A00-0000-1000-8000-00805F9B43FB");
+    public final static UUID              BATTERY_SERVICE_UUID                           = UUID.fromString("0000180F-0000-1000-8000-00805F9B43FB");
+    public final static UUID              BATTERY_LEVEL_UUID                             = UUID.fromString("00002A19-0000-1000-8000-00805F9B43FB");
+    public final static UUID              NRF_UART_SERVICE_UUID                          = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
+    public final static UUID              NRF_UART_RX_UUID                               = UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"); //write without response
+    public final static UUID              NRF_UART_TX_UUID                               = UUID.fromString("6E400003-B5A3-F393-E0A9-E50E24DCCA9E"); //notify
+    public final static UUID              DFU_SERVICE                                    = UUID.fromString("00001530-1212-EFDE-1523-785FEABCD123");
     //universal for Notify or Indicate types of characteristics
-    public final static UUID CLIENT_CHARACTERISTIC_CONFIGURATION_DESCRIPTOR = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-    private final IBinder  mBinder = new LocalBinder();
+    public final static UUID              CLIENT_CHARACTERISTIC_CONFIGURATION_DESCRIPTOR = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
+    private final       IBinder           mBinder                                        = new LocalBinder();
     // open accessibility for tests
-    public        Sensor[] sensors = new Sensor[2];
-    private final BroadcastReceiver mGattStatusReceiver = new BroadcastReceiver() {
+    public              Sensor[]          sensors                                        = new Sensor[2];
+    private final       BroadcastReceiver mGattStatusReceiver                            = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final int sensorIndex = intent.getIntExtra("sensor", 0);
@@ -75,7 +75,6 @@ public class SensorStore extends Service {
         }
     };
     public int              numSensors;
-    public BluetoothAdapter bluetoothAdapter;
     private boolean collectData = false;
 
     public static boolean isDevceInformationService(final BluetoothGattService service) {

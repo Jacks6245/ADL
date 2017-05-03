@@ -13,13 +13,10 @@ import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
 
 public class Profile {
 
-    public String name;
-
-    public int numberOfLogs;
-
-    public static Profile instance;
-
-    public Sequence profileCurrentSequence;
+    public static Profile  instance;
+    public        String   name;
+    public        int      numberOfLogs;
+    public        Sequence profileCurrentSequence;
 
     public SequenceStore sequenceStore;
 
@@ -32,7 +29,7 @@ public class Profile {
     }
 
     public void loadProfile(final String name) {
-
+        final boolean finishedLoadingProfile = false;
         this.name = name;
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -40,26 +37,93 @@ public class Profile {
                 sequenceStore.createStore(name);
                 profileCurrentSequence = new Sequence();
                 profileCurrentSequence.sequenceID = sequenceStore.allSequences.size();
-                MainActivity.getInstance().adapter.analysisView.profileLoaded();
+
 
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                Toast.makeText(MainActivity.getInstance().getBaseContext(), "Finished Loading Profile", Toast.LENGTH_SHORT).show();
+                processProfile();
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+
+    }
+
+    public void processProfile() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                sequenceStore.createAverageSequence();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
                 Toast.makeText(MainActivity.getInstance().getBaseContext(), "Finished Loading Profile", Toast.LENGTH_LONG).show();
+                averageProcessing();
+            }
+
+
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                sequenceStore.createStandardDeviationSequence();
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                Toast.makeText(MainActivity.getInstance().getBaseContext(), "Finished creating stdDev", Toast.LENGTH_SHORT).show();
+
+            }
+
+
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+
+    }
+
+    private void averageProcessing() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                sequenceStore.getAverageMin();
+                sequenceStore.getAverageMax();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                Toast.makeText(MainActivity.getInstance().getBaseContext(), "Finished creating Min/Max sequence", Toast.LENGTH_SHORT).show();
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                sequenceStore.calculateCorrelAndCovar();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                Toast.makeText(MainActivity.getInstance().getBaseContext(), "Profile Load Complete", Toast.LENGTH_LONG).show();
+                MainActivity.getInstance().adapter.analysisView.profileLoaded();
                 MainActivity.getInstance().adapter.setupView.enableConnectButtons();
                 MainActivity.getInstance().adapter.setupView.enableProfileButtons();
                 MainActivity.getInstance().adapter.setupView.profileText.setText("Profile Loaded:" + Profile.instance.name);
             }
 
 
-        }.execute();
-
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+
     public void newSequence() {
-        sequenceStore.allSequences.add(profileCurrentSequence);
         profileCurrentSequence = new Sequence();
         profileCurrentSequence.sequenceID = sequenceStore.allSequences.size();
     }

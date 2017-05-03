@@ -2,6 +2,7 @@ package com.example.jackskitt.adlarcherydatalogger.Math;
 
 import javax.vecmath.Point3d;
 
+//custom vector class
 public class Vector3 extends Point3d {
 
     public float magnitude;

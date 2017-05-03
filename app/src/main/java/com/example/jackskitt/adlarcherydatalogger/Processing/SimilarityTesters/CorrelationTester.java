@@ -1,6 +1,7 @@
 package com.example.jackskitt.adlarcherydatalogger.Processing.SimilarityTesters;
 
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
+import com.example.jackskitt.adlarcherydatalogger.Math.MathHelper;
 import com.example.jackskitt.adlarcherydatalogger.Processing.Matchers.PatternMatcher;
 
 import java.util.ArrayList;
@@ -35,8 +36,8 @@ public class CorrelationTester extends SimilarityTester {
     private double calcuateCorrelation() {
         PatternMatcher patternMatcher = (PatternMatcher) this.patternMatcher;
         if (stdDeviation != 0) {
-            double x = 1.0 / ((double) (patternMatcher.lengthOfTemplate));
-            return covariance * x;
+            double x = patternMatcher.stdDeviation * stdDeviation;
+            return covariance / x;
         } else {
             return 0;
         }
@@ -55,13 +56,12 @@ public class CorrelationTester extends SimilarityTester {
         double            total          = 0;
         PatternMatcher    patternMatcher = (PatternMatcher) this.patternMatcher;
         //allows me to handle the data if there's not enough for a full curve.
-
         for (int i = 0; i < patternMatcher.lengthOfTemplate; i++) {
             double normValue = (normalizeMean(patternMatcher.getRemovedValue(testSetRef.get(i + (start)))));
             total += (patternMatcher.samples[i] - patternMatcher.mean) * normValue;
         }
         //calculate R of the Cross CorrelationTester equation
-        return total / (stdDeviation * patternMatcher.stdDeviation);
+        return total / patternMatcher.lengthOfTemplate;
     }
 
 

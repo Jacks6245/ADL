@@ -46,7 +46,6 @@ public class AnalysisView extends Fragment implements OnChartValueSelectedListen
     private Switch       sensorSwitch;
     private Button       prev;
     private Button       next;
-    private Button       delete;
     private ToggleButton minMaxToggle;
     private ToggleButton averageToggle;
 
@@ -149,11 +148,24 @@ public class AnalysisView extends Fragment implements OnChartValueSelectedListen
                 loadNewSequence(selectedIndex);
             }
         });
+        sensorSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    sensorIndex = 1;
+                    sensorSwitch.setText("Glove: ");
+                } else {
+                    sensorIndex = 0;
+                    sensorSwitch.setText("Bow: ");
+                }
+                loadNewSequence(selectedIndex);
+            }
+        });
     }
 
     private void loadNewSequence(int index) {
         for (int i = 0; i < 6; i++) {
-            bowDataSet.set(i, getAxisSet(Profile.instance.sequenceStore.allSequences.get(index).sequenceData[0], i));
+            bowDataSet.set(i, getAxisSet(Profile.instance.sequenceStore.allSequences.get(index).sequenceData[sensorIndex], i));
         }
         updateTextValues(Profile.instance.sequenceStore.allSequences.get(selectedIndex));
         updateChartAnimate();
@@ -161,11 +173,13 @@ public class AnalysisView extends Fragment implements OnChartValueSelectedListen
 
     public void profileLoaded() {
         processSequenceChartSet(Profile.instance.sequenceStore.allSequences.get(0), 0);
+        updateStatsGraphs();
+    }
+
+    public void updateStatsGraphs() {
         processAverageLines();
         processMinMax();
         processStdDev();
-
-
     }
 
     private Entry processSample(Sample s, int sampleIndex) {
@@ -191,8 +205,6 @@ public class AnalysisView extends Fragment implements OnChartValueSelectedListen
                 set = setStdDevSettings(set);
                 stdDevSets.add(set);
             }
-
-
         }
     }
 
@@ -212,8 +224,8 @@ public class AnalysisView extends Fragment implements OnChartValueSelectedListen
                 correlText.setText("" + s.gloveCorrelation);
             }
             averageAimTime.setText(aimTimeFormat(Profile.instance.sequenceStore.averageAimTime));
-            stdDevAccText.setText(formatAccelerationString(Profile.instance.sequenceStore.deviationAverage));
-            stdDevRotText.setText(formatRotationString(Profile.instance.sequenceStore.deviationAverage));
+            stdDevAccText.setText(formatAccelerationString(Profile.instance.sequenceStore.deviationAverage[sensorIndex]));
+            stdDevRotText.setText(formatRotationString(Profile.instance.sequenceStore.deviationAverage[sensorIndex]));
         }
     }
 
@@ -222,7 +234,7 @@ public class AnalysisView extends Fragment implements OnChartValueSelectedListen
     }
 
     private String formatRotationString(Sample s) {
-        return "Rot:  X: " + String.format("%.3f", s.quat.x) + " | Y: " + String.format("%.3f", s.quat.y) + " | Z: " + String.format("%.3f", s.quat.z) + " |";
+        return "Rot:  X: " + String.format("%.3f", s.rot.x) + " | Y: " + String.format("%.3f", s.rot.y) + " | Z: " + String.format("%.3f", s.rot.z) + " |";
     }
 
     private String aimTimeFormat(double aimTime) {
@@ -497,7 +509,6 @@ public class AnalysisView extends Fragment implements OnChartValueSelectedListen
         }
     }
 
-
     public void manageStdDeviationLine(int i) {
         clearVisible(i);
         if (averageToggle.isChecked())
@@ -525,7 +536,6 @@ public class AnalysisView extends Fragment implements OnChartValueSelectedListen
 
         prev = (Button) view.findViewById(R.id.prevButton);
         next = (Button) view.findViewById(R.id.nextButton);
-        delete = (Button) view.findViewById(R.id.DeleteButton);
 
         minMaxToggle = (ToggleButton) view.findViewById(R.id.minmaxToggle);
         averageToggle = (ToggleButton) view.findViewById(R.id.averageToggle);

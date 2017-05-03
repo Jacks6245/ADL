@@ -11,17 +11,14 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
-import com.example.jackskitt.adlarcherydatalogger.Collection.Sequence;
 import com.example.jackskitt.adlarcherydatalogger.Math.MathHelper;
 import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 import com.example.jackskitt.adlarcherydatalogger.UI.SensorView;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -152,7 +149,7 @@ public class Sensor {
                 //Transform3D q = new Transform3D();
                 // point representing the acceleration
                 // sets the acceleration in world coordinates
-                //    q.setRotation(sample.quat);
+                //    q.setRotation(sample.rot);
                 //  q.transform(sample.acce);
 
                 //       if (true) {
@@ -177,7 +174,7 @@ public class Sensor {
             if (currentType == CHART_TYPE.ACCELERATION) {
                 value = sampleToAdd.acce.getValueByNumber(i);
             } else if (currentType == CHART_TYPE.ROTATION) {
-                value = sampleToAdd.quat.getValueByNumber(i);//need to fix this
+                value = sampleToAdd.rot.getValueByNumber(i);//need to fix this
             } else if (currentType == CHART_TYPE.COMPASS) {
                 value = sampleToAdd.magn.getValueByNumber(i);
             }

@@ -15,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.example.jackskitt.adlarcherydatalogger.Collection.FileManager;
 import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 import com.example.jackskitt.adlarcherydatalogger.R;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
@@ -105,9 +104,9 @@ public class SensorView extends Fragment implements OnChartValueSelectedListener
                             new AsyncTask<Void, Void, Void>() {
                                 @Override
                                 protected Void doInBackground(Void... params) {
-                                    if (Profile.instance.profileCurrentSequence.getSizeOfSet() > 0) {
-                                        Profile.instance.profileCurrentSequence.processSequence();
+                                    if (Profile.instance.profileCurrentSequence.getSizeOfSet() > 0 && !Profile.instance.profileCurrentSequence.processed) {
 
+                                        Profile.instance.profileCurrentSequence.processSequence();
                                     }
                                     return null;
                                 }

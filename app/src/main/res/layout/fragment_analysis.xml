@@ -1,7 +1,537 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.5"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.12"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView15"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.08"
+                    android:text="Acceleration"
+                    android:textAlignment="center"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.08"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/accXSelection"
+                        android:layout_width="65dp"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="X"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="true"
+                        android:textColor="#be1c1c"
+                        android:textColorHint="#be1c1c"
+                        android:textColorLink="#b62121"
+                        tools:text="x"/>
+
+                    <CheckBox
+                        android:id="@+id/accYSelection"
+                        android:layout_width="61dp"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="y"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="true"
+                        android:textColor="#3dc51c"
+                        android:textColorLink="#3dc51c"
+                        tools:text="y"/>
+
+                    <CheckBox
+                        android:id="@+id/accZSelection"
+                        android:layout_width="54dp"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="z"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="true"
+                        android:textColor="#0b93e7"
+                        tools:text="z"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/view6"
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/fab_stroke_top_outer_color"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.18"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/rotdesc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.08"
+                    android:text="Rotation"
+                    android:textAlignment="center"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.08"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/rotXSelection"
+                        android:layout_width="65dp"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="X"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="true"
+                        android:textColor="#fde638"
+                        android:textColorLink="#b62121"
+
+                        tools:text="x"/>
+
+                    <CheckBox
+                        android:id="@+id/rotYSelection"
+                        android:layout_width="61dp"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="y"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="true"
+                        android:textColor="#21ffe5"
+                        tools:text="y"/>
+
+                    <CheckBox
+                        android:id="@+id/rotZSelection"
+                        android:layout_width="54dp"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="z"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="true"
+                        android:textColor="#ff2ef5"
+                        tools:text="z"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/view7"
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/fab_stroke_top_outer_color"/>
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"/>
+
+            <View
+                android:id="@+id/view8"
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/fab_stroke_top_outer_color"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView16"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sensor Switch"
+                    android:textAlignment="center"/>
+
+                <Switch
+                    android:id="@+id/sensorSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:splitTrack="false"
+                    android:switchMinWidth="@android:dimen/notification_large_icon_height"
+                    android:switchTextAppearance="@style/TextAppearance.AppCompat"
+                    android:text="Bow: "
+                    android:textAlignment="center"
+                    tools:checked="false"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view5"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_weight="0"
+            android:background="@color/fab_stroke_top_outer_color"/>
+
+        <view
+            android:id="@+id/chartView"
+            class="com.github.mikephil.charting.charts.LineChart"
+            id="@+id/view9"
+            layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/fab_stroke_top_outer_color"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/abc_action_bar_overflow_padding_start_material"
+            android:text="Analysis"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="24sp"/>
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/fab_stroke_top_outer_color"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/prevButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:elevation="24dp"
+                android:lineSpacingExtra="12sp"
+                android:text="Prev"
+                android:textAlignment="center"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:typeface="monospace"/>
+
+            <TextView
+                android:id="@+id/currentSequenceText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                tools:text="1/20"/>
+
+            <Button
+                android:id="@+id/nextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Next"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:typeface="monospace"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/fab_stroke_top_outer_color"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ToggleButton
+                android:id="@+id/stdDeviationToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAllCaps="false"
+                android:textOff="Std Dev"
+                android:textOn="Std Dev"/>
+
+            <ToggleButton
+                android:id="@+id/minmaxToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="false"
+                android:text="Min/Max"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textOff="Min/Max"
+                android:textOn="Min/Max"/>
+
+            <ToggleButton
+                android:id="@+id/averageToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="false"
+                android:text="ToggleButton"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textOff="Average"
+                android:textOn="Average"/>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view13"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/fab_stroke_top_outer_color"/>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Shot Information:"
+                    android:textAlignment="textEnd"
+                    android:textStyle="bold"/>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:text="ID:"
+                    android:textAlignment="textEnd"/>
+
+                <TextView
+                    android:id="@+id/idEntry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginLeft="10dp"
+                    android:text="0"
+                    android:textAlignment="viewStart"/>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView17"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:text="Date:"
+                    android:textAlignment="textEnd"/>
+
+                <TextView
+                    android:id="@+id/textDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginLeft="10dp"
+                    android:text="0"
+                    android:textAlignment="viewStart"/>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:text="Aim Time:"
+                    android:textAlignment="textEnd"/>
+
+                <TextView
+                    android:id="@+id/aimEntry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginLeft="10dp"
+                    android:text="0"
+                    android:textAlignment="viewStart"/>
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/Correlation"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Correlation:"
+                    android:textAlignment="viewEnd"/>
+
+                <TextView
+                    android:id="@+id/correlationText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginLeft="10dp"
+                    android:text="0"
+                    android:textAlignment="viewStart"/>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView22"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Covariance:"
+                    android:textAlignment="viewEnd"/>
+
+                <TextView
+                    android:id="@+id/coVarText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginLeft="10dp"
+                    android:text="0"
+                    android:textAlignment="viewStart"/>
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/fab_stroke_top_outer_color"
+                android:divider="@color/accent_material_light"
+                android:visibility="visible">
+
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView19"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Profile Information:"/>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView24"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Standard Dev:"
+                    android:textAlignment="textEnd"/>
+
+                <TextView
+                    android:id="@+id/stdDevAccText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginLeft="10dp"
+                    android:text="Acce: X: 0.000 | Y: 0.000 | Z: 0.000 |"
+                    android:textAlignment="viewStart"
+                    android:textSize="12sp"/>
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/stdDevRotText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="sans-serif"
+                    android:text="Rot:    X: 0.000 | Y: 0.000 | Z: 0.000 |"
+                    android:textAlignment="viewStart"
+                    android:textSize="12sp"/>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView25"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Average Aim Time: "
+                    android:textAlignment="viewEnd"/>
+
+                <TextView
+                    android:id="@+id/averageAimTimeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textAlignment="viewStart"/>
+            </TableRow>
+
+        </TableLayout>
+
+        <View
+            android:id="@+id/view12"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/fab_stroke_top_outer_color"/>
+
+    </LinearLayout>
 
 </LinearLayout>

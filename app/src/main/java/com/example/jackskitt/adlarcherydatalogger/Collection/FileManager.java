@@ -27,16 +27,16 @@ public class FileManager {
     public final static String defaultDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/ADL_Logs/";
 
     //TODO:  update this for android
-
-    static void doesDirectoryExist() {
+//checks if the default directory exists, and if not it creates it
+    public static void doesDirectoryExist() {
         File tempFile = new File(defaultDirectory);
         if (tempFile.exists()) {
             tempFile.mkdir();
         }
     }
 
-
-    static void saveToFile(Sequence sequence, StringBuilder sb) {
+    //first creates the file name form the profile  name and  it's sequence_ID. then wries the sequence to the file.
+    public static void saveToFile(Sequence sequence, StringBuilder sb) {
         try {
             File file = new File(defaultDirectory, makeProfileFileName(Profile.instance.name, sequence.sequenceID));
             if (!file.exists()) {
@@ -52,6 +52,7 @@ public class FileManager {
         }
     }
 
+    //Reads the sequence file into a new  sequence which is then saved into the  profiles sequence store.
 
     //TODO: need to add profile name saving
     public static Sequence readFile(File file) {
@@ -61,19 +62,21 @@ public class FileManager {
                 reader = new BufferedReader(new FileReader(file));
 
                 String line;
-//temp change bacck
+                //temp change bacck
                 Sequence tempSequence = new Sequence();
                 tempSequence.date = getProfileDate(file.getName());
                 TemplateStore.instance.resetForNewSequence();
                 int sensorIndex = -1;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith("$")) {
+                        //gets the file header that identifies the sequence
 
                         String[] values = line.split(",");
 
                         tempSequence.sequenceID = Integer.parseInt(values[1]);
 
                     } else if (line.startsWith("#")) {
+                        ////gets the header information from the sensor and loads it into the sensor
                         String[] values = line.split(",");
                         sensorIndex++;
                         tempSequence.sequenceData[sensorIndex].sensorName = values[0].substring(1);
@@ -87,11 +90,12 @@ public class FileManager {
                         String[] values = line.split(",");
                         tempSequence.sequenceData[sensorIndex].getEvents().add(filterMarkers(line));
                     } else {
+                        //filters the sequence ID into
                         tempSequence.addSample(sensorIndex, filterResults(line));
                     }
                 }
 
-                tempSequence.splitSequence();
+                //tempSequence.splitSequence();
                 TemplateStore.instance.resetForNewSequence();
 
                 return tempSequence;
@@ -110,6 +114,7 @@ public class FileManager {
         return null;
     }
 
+    //splits the CSV data
     public static Sample filterResults(String line) {
         String values[] = line.split(",");
         return new Sample(values);
@@ -121,6 +126,7 @@ public class FileManager {
         return new Event(values);
     }
 
+    //returns a list of all the files that the name matches that of the orifuke that is being looked for
     public static File[] findAllFilesForUser(String name) {
         ArrayList<File> outputFiles = new ArrayList<>();
 
@@ -133,7 +139,7 @@ public class FileManager {
             for (File file : listOfFiles) {
                 if (file.isFile()) {
 
-                    if (file.getName().contains(name)) {
+                    if (getProfileName(file.getName()).equals(name)) {
                         outputFiles.add(file);
                     }
 
@@ -145,6 +151,7 @@ public class FileManager {
         return arrayOutput;
 
     }
+//returns the list of profiles for the ProfileList and formats them into the ProfileListValue object
 
     public static Collection<ProfileListValue> findAllProfiles() {
         Hashtable<String, ProfileListValue> files = new Hashtable<>();

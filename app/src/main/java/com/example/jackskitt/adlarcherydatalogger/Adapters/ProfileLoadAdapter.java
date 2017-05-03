@@ -33,6 +33,7 @@ public class ProfileLoadAdapter extends BaseAdapter {
         this.context = context;
 
         listItemInflater = LayoutInflater.from(context);
+        //gets all the profiles from the file store
         profileList = FileManager.findAllProfiles().toArray(profileList);
 
     }
@@ -62,7 +63,7 @@ public class ProfileLoadAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
+//load the ProfileListValues from the saved list
         if (convertView == null) {
             convertView = listItemInflater.inflate(R.layout.list_view_item, null);
             profileName = (TextView) convertView.findViewById(R.id.deviceName);

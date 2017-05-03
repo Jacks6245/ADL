@@ -24,12 +24,15 @@ public class PatternMatcher extends EventSearch {
 
     public PatternMatcher(InputStream templateName) {
         super("PatternMatcher");
-        readFile(templateName);
-        calculateValues();
-        similarityTester = new CorrelationTester(this);
+        if (templateName != null) {
+            readFile(templateName);
+            calculateValues();
+            similarityTester = new CorrelationTester(this);
+        }
     }
 
-    //with this normalisation method, the closer the distance to the mean the more certain it is
+    //with this normalisation method, the closer the distance to
+    // #the mean the more certain it is
     public void searchForEvent(double toAdd) {
         double r = similarityTester.getSimilarity(toAdd);
 

@@ -1,5 +1,6 @@
 package com.example.jackskitt.adlarcherydatalogger.UI;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +22,9 @@ public class MainActivity extends FragmentActivity {
     public         SensorStore    store;
     public         TabViewAdapter adapter;
     boolean mBound = false;
-    private ViewPager viewPage;
+    private ViewPager        viewPage;
+    public  BluetoothAdapter bluetoothAdapter;
+
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -66,7 +69,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        this.unbindService(mConnection);
         this.stopService(new Intent(getBaseContext(), SensorStore.class));
 
     }

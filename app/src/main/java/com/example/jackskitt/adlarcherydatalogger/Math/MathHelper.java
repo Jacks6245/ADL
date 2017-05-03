@@ -38,6 +38,7 @@ public class MathHelper {
         return ConvertTwoByteValueToSInt(value);
     }
 
+    //gets data from raw value to int
     public static int ConvertTwoByteValueToSInt(byte[] b) {
         int i = 0;
         if (b.length != 2) {
@@ -48,6 +49,7 @@ public class MathHelper {
         return i;
     }
 
+    //calculates the mean of a data set
     public static double calculateMean(double[] set) {
         double total = 0;
         for (double value : set) {
@@ -56,6 +58,7 @@ public class MathHelper {
         return (total / set.length);
     }
 
+    //calculates the variance of a data set
     public static double calculateVariance(double[] samples, double mean) {
         double variance = 0;
         for (double s : samples) {
@@ -64,6 +67,7 @@ public class MathHelper {
         return variance;
     }
 
+    //calculates the standarad deviation of a set with a supplied mean
     public static double calculateStdDeviation(double[] samples, double mean) {
         double stdDeviation = 0;
         for (double s : samples) {
@@ -72,6 +76,8 @@ public class MathHelper {
         return Math.sqrt(stdDeviation / (samples.length - 1));
     }
 
+
+    //calculates the std deviation and mean of a dataset
     public static double calculateStdDeviation(double[] samples) {
         double stdDeviation = 0;
         double mean         = calculateMean(samples);
@@ -81,6 +87,16 @@ public class MathHelper {
         return Math.sqrt(stdDeviation / (samples.length - 1));
     }
 
+    public static double calculateStdDeviationP(double[] samples) {
+        double stdDeviation = 0;
+        double mean         = calculateMean(samples);
+        for (double s : samples) {
+            stdDeviation += Math.pow(s - mean, 2);
+        }
+        return Math.sqrt(stdDeviation / (samples.length));
+    }
+
+    //covariance of a dataset
     public static double calculateCovariance(double[] setA, double[] setB) {
         double total = 0;
         if (setA.length == setB.length) {
@@ -89,11 +105,12 @@ public class MathHelper {
             double bMean = calculateMean(setB);
             double aMean = calculateMean(setA);
 
-            for (int i = 0; i < setA.length - 1; i++) {
-                total += (setA[i] - aMean) * (setB[i] - bMean);
+            for (int i = 0; i < setA.length; i++) {
+                total += ((setA[i] - aMean) * (setB[i] - bMean));
             }
             //calculate R of the Cross CorrelationTester equation
-            return total / (calculateStdDeviation(setA, aMean) * calculateStdDeviation(setB, bMean));
+            //return total / (calculateStdDeviation(setA, aMean) * calculateStdDeviation(setB, bMean));
+            return total / ((setA.length));
         }
         return 0;
 
@@ -101,15 +118,16 @@ public class MathHelper {
 
 
     public static double calcuateCorrelation(double[] setA, double[] setB) {
-        return calculateCovariance(setA, setB) / (calculateStdDeviation(setA) * calculateStdDeviation(setB));
+        return calculateCovariance(setA, setB) / (calculateStdDeviationP(setA) * calculateStdDeviationP(setB));
     }
 
     public static double calcuateCorrelation(double[] setA, double[] setB, double stdDevA, double stdDivB) {
         return calculateCovariance(setA, setB) / (stdDevA * stdDivB);
     }
 
-    public static double calcuateCorrelation(double coVariance, double length) {
-        return coVariance * (1.0 / length);
+    //correlation of a dataset
+    public static double calcuateCorrelation(double coVariance, double[] setA, double[] setB) {
+        return coVariance / (calculateStdDeviationP(setA) * calculateStdDeviationP(setB));
     }
 
 

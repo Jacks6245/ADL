@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import javax.vecmath.Quat4d;
 
+@Deprecated
 public class Quaternion extends Quat4d {
     public static int[] colours = {Color.GREEN, Color.RED, Color.WHITE, Color.BLUE};
 

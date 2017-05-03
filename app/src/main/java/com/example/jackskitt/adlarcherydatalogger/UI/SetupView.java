@@ -83,10 +83,10 @@ public class SetupView extends Fragment {
         bowDisconnect = (Button) view.findViewById(R.id.bowSensorDisconnect);
         gloveDisconnect = (Button) view.findViewById(R.id.gloveDisconnect);
 
-        bowConnect.setEnabled(false);
-        gloveConnect.setEnabled(false);
-        bowDisconnect.setEnabled(false);
-        gloveDisconnect.setEnabled(false);
+        bowConnect.setEnabled(Profile.instance != null);
+        gloveConnect.setEnabled(Profile.instance != null);
+        bowDisconnect.setEnabled(Profile.instance != null);
+        gloveDisconnect.setEnabled(Profile.instance != null);
 
         scanButton = (Button) view.findViewById(R.id.scanbutton);
         newProfileButton = (Button) view.findViewById(R.id.buttonNewProfile);
@@ -183,6 +183,9 @@ public class SetupView extends Fragment {
             @Override
             public void onClick(View v) {
                 new Profile(newProfileEntry.getText().toString());
+                MainActivity.getInstance().adapter.setupView.enableConnectButtons();
+                MainActivity.getInstance().adapter.setupView.enableProfileButtons();
+
                 profileText.setText("Profile: " + Profile.instance.name);
             }
         });
@@ -233,16 +236,16 @@ public class SetupView extends Fragment {
     }
 
     private void setupBluetooth() {
-        MainActivity.getInstance().store.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (MainActivity.getInstance().store.bluetoothAdapter == null) {
+        MainActivity.getInstance().bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (MainActivity.getInstance().bluetoothAdapter == null) {
             //No Bluetooth  support
         }
         //enable bluetooth is disables
-        if (!MainActivity.getInstance().store.bluetoothAdapter.isEnabled()) {
+        if (!MainActivity.getInstance().bluetoothAdapter.isEnabled()) {
             Intent enableBluetoothSetting = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBluetoothSetting, 0);
         }
-        bluetoothScanner = MainActivity.getInstance().store.bluetoothAdapter.getBluetoothLeScanner();
+        bluetoothScanner = MainActivity.getInstance().bluetoothAdapter.getBluetoothLeScanner();
         settings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_BALANCED).build();
 
     }

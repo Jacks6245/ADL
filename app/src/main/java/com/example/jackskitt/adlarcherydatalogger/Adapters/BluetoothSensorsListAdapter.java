@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by Jack Skitt on 11/04/2017.
  */
-
+//adapter for the bluetooth device selection list
 public class BluetoothSensorsListAdapter extends BaseAdapter {
     public  TextView                   deviceName;
     public  TextView                   deviceConnected;
@@ -37,6 +37,7 @@ public class BluetoothSensorsListAdapter extends BaseAdapter {
     }
 
     public void addDevice(BluetoothDevice toAdd) {
+        //adds a device to the sensor List
         if (!sensorDevices.contains(toAdd)) {
             sensorDevices.add(toAdd);
 
@@ -71,11 +72,12 @@ public class BluetoothSensorsListAdapter extends BaseAdapter {
 
         if (convertView == null) {
             convertView = listItemInflater.inflate(R.layout.list_view_item, null);
+            //defines a custom list item that lists the device name and
             deviceName = (TextView) convertView.findViewById(R.id.deviceName);
             deviceConnected = (TextView) convertView.findViewById(R.id.connectedText);
         }
 
-
+        //Assigns a new device based on the selected device
         BluetoothDevice device = sensorDevices.get(position);
         deviceName.setText(device.getName());
         deviceConnected.setText(device.getAddress());
