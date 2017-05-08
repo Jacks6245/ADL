@@ -1,6 +1,6 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
-import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
+import com.example.jackskitt.adlarcherydatalogger.Processing.FeatureSelectorStore;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
 
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class SampleStorage {
         double[] toReturn = new double[end - start];
         if (samples.size() > end) {
             for (int i = 0; i < (end - start); i++) {
-                toReturn[i] = TemplateStore.instance.getSearcher(index).getRemovedValue(samples.get((start + i) + 1));
+                toReturn[i] = FeatureSelectorStore.instance.getSearcher(index).getRemovedValue(samples.get((start + i) + 1));
             }
         }
         return toReturn;

@@ -4,7 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.example.jackskitt.adlarcherydatalogger.Adapters.ProfileListValue;
-import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
+import com.example.jackskitt.adlarcherydatalogger.Processing.FeatureSelectorStore;
 import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 
 import java.io.BufferedReader;
@@ -65,7 +65,7 @@ public class FileManager {
                 //temp change bacck
                 Sequence tempSequence = new Sequence();
                 tempSequence.date = getProfileDate(file.getName());
-                TemplateStore.instance.resetForNewSequence();
+                FeatureSelectorStore.instance.resetForNewSequence();
                 int sensorIndex = -1;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith("$")) {
@@ -96,7 +96,7 @@ public class FileManager {
                 }
 
                 //tempSequence.splitSequence();
-                TemplateStore.instance.resetForNewSequence();
+                FeatureSelectorStore.instance.resetForNewSequence();
 
                 return tempSequence;
             }

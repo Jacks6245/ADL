@@ -1,7 +1,7 @@
 package com.example.jackskitt.adlarcherydatalogger.Collection;
 
 import com.example.jackskitt.adlarcherydatalogger.Math.MathHelper;
-import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
+import com.example.jackskitt.adlarcherydatalogger.Processing.FeatureSelectorStore;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -148,7 +148,7 @@ public class SequenceStore {
         int    numSeq    = 0;
         for (File file : fileNames) {
             Sequence tempSeq;
-            TemplateStore.instance.resetTemplate(0);
+            FeatureSelectorStore.instance.resetTemplate(0);
             tempSeq = FileManager.readFile(file);
             if (tempSeq.sequenceData[1].equals(null)) {
                 numSensors = 1;

@@ -7,9 +7,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by Jack Skitt on 30/04/2017.
- */
 
 public class SampleTests {
     Sample a = new Sample(2, 3, 1, 2, 3, 4, 1, 1, 1, true);

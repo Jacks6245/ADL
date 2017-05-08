@@ -19,32 +19,32 @@ import java.io.InputStream;
  * Created by Jack Skitt on 18/04/2017.
  */
 
-public class TemplateStore {
-    public static TemplateStore instance;
+public class FeatureSelectorStore {
+    public static FeatureSelectorStore instance;
     public static int releaseRecordTime = 300;//amount to record after the bow is shot
     public static int backsearchTime    = 150;//this is the  aiming time. needs to be tweaked per user
     public        int recordStartIndex  = 0;
-    public EventSearch[] patternMatchers;
+    public EventSearch[] eventSearchers;
     public int bowShotindex = 0;
     private InputStream drawTemplate;
     private int releaseCount     = 0;
     private int postRemovalDelay = 0;
     private int trueNegatives    = 0;
 
-    public TemplateStore() {
+    public FeatureSelectorStore() {
         if (MainActivity.getInstance() != null) {
             drawTemplate = MainActivity.getInstance().getApplicationContext().getResources().openRawResource(R.raw.bowdrawtemplate);
         }
         //allows for a globably accessed variable
         instance = this;
-        patternMatchers = new EventSearch[3];
+        eventSearchers = new EventSearch[3];
         //load the blank templates  into the array
         populateTemplate();
 
     }
 
     public void resetTemplateEvent(int i) {
-        patternMatchers[i].resetForEvent();
+        eventSearchers[i].resetForEvent();
     }
 
     //This is the main method that checks for an event when a sample is  added, it first looks to find
@@ -55,21 +55,21 @@ public class TemplateStore {
 
         if (!seq.isBowShotFound()) {
             if (postRemovalDelay <= 0) {
-                patternMatchers[0].testingSequence = seq;
-                patternMatchers[0].searchForEvent(patternMatchers[0].getRemovedValue(toAdd));
+                eventSearchers[0].testingSequence = seq;
+                eventSearchers[0].searchForEvent(eventSearchers[0].getRemovedValue(toAdd));
             } else {
                 postRemovalDelay--;
             }
         } else if (!seq.isBowDrawFound()) {
-            patternMatchers[1].similarityTester.searchStart = patternMatchers[0].similarityTester.start - (backsearchTime + patternMatchers[1].lengthOfTemplate);
-            patternMatchers[1].testingSequence = seq;
+            eventSearchers[1].similarityTester.searchStart = eventSearchers[0].similarityTester.start - (backsearchTime + eventSearchers[1].lengthOfTemplate);
+            eventSearchers[1].testingSequence = seq;
 
-            for (int i = 0; i < backsearchTime + (patternMatchers[1].lengthOfTemplate); i++) {
+            for (int i = 0; i < backsearchTime + (eventSearchers[1].lengthOfTemplate); i++) {
                 if (seq.isBowDrawFound()) {
                     break;
                 }
-                double startBackSearch = patternMatchers[1].getRemovedValue(seq.sequenceData[0].getSamples().get(i + patternMatchers[1].similarityTester.searchStart));
-                patternMatchers[1].searchForEvent(startBackSearch);
+                double startBackSearch = eventSearchers[1].getRemovedValue(seq.sequenceData[0].getSamples().get(i + eventSearchers[1].similarityTester.searchStart));
+                eventSearchers[1].searchForEvent(startBackSearch);
             }
             if (!seq.isBowDrawFound()) {
                 seq.removeShotFlag();
@@ -98,17 +98,17 @@ public class TemplateStore {
     private void resetAfterFalseResult() {
         trueNegatives++;
         postRemovalDelay = 50;
-        int storedIndex = patternMatchers[0].similarityTester.start;
-        patternMatchers[0].resetTemplate();
-        patternMatchers[0].similarityTester.start = storedIndex + 50;
-        patternMatchers[1].resetTemplate();
+        int storedIndex = eventSearchers[0].similarityTester.start;
+        eventSearchers[0].resetTemplate();
+        eventSearchers[0].similarityTester.start = storedIndex + 50;
+        eventSearchers[1].resetTemplate();
     }
 
     //adds a split event to the sequence and resets the searcher at the same time;
     public void setSplitEvent(int start, int end, double confidence, Sequence seq) {
-        patternMatchers[0].resetTemplate();
-        patternMatchers[0].similarityTester.start = end + (trueNegatives * 50);
-        patternMatchers[1].resetTemplate();
+        eventSearchers[0].resetTemplate();
+        eventSearchers[0].similarityTester.start = end + (trueNegatives * 50);
+        eventSearchers[1].resetTemplate();
 
         seq.splitEvent.add(new Event(start,
                 end,
@@ -117,12 +117,12 @@ public class TemplateStore {
     }
 
     public void resetTemplate(int i) {
-        patternMatchers[i].resetTemplate();
+        eventSearchers[i].resetTemplate();
     }
 
     public void resetForNewSequence() {
-        patternMatchers[0].resetTemplate();
-        patternMatchers[1].resetTemplate();
+        eventSearchers[0].resetTemplate();
+        eventSearchers[1].resetTemplate();
     }
 
     //adds new templates to the store
@@ -131,18 +131,18 @@ public class TemplateStore {
             switch (i) {
                 case 0:
                     //bow shot as first template
-                    patternMatchers[i] = new DifferenceMatcher(1f, 1.5f, EventSearch.TemplateType.BOW_SHOT);
+                    eventSearchers[i] = new DifferenceMatcher(1f, 1.5f, EventSearch.TemplateType.BOW_SHOT);
                     break;
                 case 1:
-                    patternMatchers[i] = new PatternMatcher(drawTemplate);
+                    eventSearchers[i] = new PatternMatcher(drawTemplate);
                     break;
             }
         }
     }
 
     public EventSearch getSearcher(int i) {
-        if (i < patternMatchers.length) {
-            return patternMatchers[i];
+        if (i < eventSearchers.length) {
+            return eventSearchers[i];
         }
         return null;
     }

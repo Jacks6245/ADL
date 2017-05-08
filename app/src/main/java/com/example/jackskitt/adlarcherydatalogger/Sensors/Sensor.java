@@ -146,17 +146,6 @@ public class Sensor {
 
                 Sample sample = getSample(sampleData);
 
-                //Transform3D q = new Transform3D();
-                // point representing the acceleration
-                // sets the acceleration in world coordinates
-                //    q.setRotation(sample.rot);
-                //  q.transform(sample.acce);
-
-                //       if (true) {
-                // save the sample
-                //         Sequence.getInstance().sequenceData[id].addSample(sample);
-                //   }
-
                 if (Profile.instance != null && collectData) {
                     Profile.instance.profileCurrentSequence.addSample(id, sample);
                 }

@@ -4,7 +4,7 @@ import com.example.jackskitt.adlarcherydatalogger.Collection.Event;
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
 import com.example.jackskitt.adlarcherydatalogger.Collection.SampleStorage;
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sequence;
-import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
+import com.example.jackskitt.adlarcherydatalogger.Processing.FeatureSelectorStore;
 import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 
 import org.junit.Test;
@@ -18,8 +18,8 @@ import static org.junit.Assert.*;
  */
 
 public class SequenceTests {
-    Profile       p  = new Profile("test");
-    TemplateStore ts = new TemplateStore();
+    Profile              p  = new Profile("test");
+    FeatureSelectorStore ts = new FeatureSelectorStore();
 
 
     Sequence testSequence = new Sequence();

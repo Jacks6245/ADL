@@ -1,15 +1,11 @@
 package com.example.jackskitt.adlarcherydatalogger.Processing.Matchers;
 
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.util.Log;
 
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sample;
 import com.example.jackskitt.adlarcherydatalogger.Collection.Sequence;
 import com.example.jackskitt.adlarcherydatalogger.Processing.SimilarityTesters.SimilarityTester;
-import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
-import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
+import com.example.jackskitt.adlarcherydatalogger.Processing.FeatureSelectorStore;
 
 /**
  * Created by Jack Skitt on 22/04/2017.
@@ -55,7 +51,7 @@ public abstract class EventSearch {
                 break;
             case BOW_SHOT:
                 testingSequence.setBowShotFound(start, end, confidence);
-                TemplateStore.instance.bowShotindex = end;
+                FeatureSelectorStore.instance.bowShotindex = end;
                 break;
             case GLOVE_RELEASE:
                 testingSequence.setGloveReleaseFound(start, end, confidence);

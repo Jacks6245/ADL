@@ -2,7 +2,7 @@ package com.example.jackskitt.adlarcherydatalogger.Collection;
 
 import android.support.annotation.NonNull;
 
-import com.example.jackskitt.adlarcherydatalogger.Processing.TemplateStore;
+import com.example.jackskitt.adlarcherydatalogger.Processing.FeatureSelectorStore;
 import com.example.jackskitt.adlarcherydatalogger.Profiles.Profile;
 import com.example.jackskitt.adlarcherydatalogger.Sensors.Sensor;
 import com.example.jackskitt.adlarcherydatalogger.UI.MainActivity;
@@ -77,7 +77,7 @@ public class Sequence implements Comparable<Sequence> {
     public void setBowDrawFound(int start, int end, double r) {
         drawEvent.add(new Event(start, end, r));
         bowDrawFound = true;
-        TemplateStore.instance.resetTemplateEvent(0);
+        FeatureSelectorStore.instance.resetTemplateEvent(0);
 
     }
 
@@ -128,7 +128,7 @@ public class Sequence implements Comparable<Sequence> {
         for (int i = 0; i < sequenceData.length; i++) {
             if (i == 0) {//only check the bow sensor at the moment
                 for (int j = 0; j < sequenceData[0].getSamples().size(); j++) {
-                    TemplateStore.instance.checkTemplates(sequenceData[0].getSamples().get(j), this);
+                    FeatureSelectorStore.instance.checkTemplates(sequenceData[0].getSamples().get(j), this);
                 }
                 splitSequence();
             }
@@ -174,8 +174,8 @@ public class Sequence implements Comparable<Sequence> {
                         toReturn.sequenceData[i].blankSamples();
 
                         end = sequenceData[i].getSamples().size() - 1;
-                        int missingEnd = (split.endTime - TemplateStore.releaseRecordTime);//end of sequence
-                        int x          = (TemplateStore.releaseRecordTime - (sequenceData[i].getSamples().size() - missingEnd)) - split.startTime;
+                        int missingEnd = (split.endTime - FeatureSelectorStore.releaseRecordTime);//end of sequence
+                        int x          = (FeatureSelectorStore.releaseRecordTime - (sequenceData[i].getSamples().size() - missingEnd)) - split.startTime;
                         endPadding(i, x);
                     }
 
@@ -224,8 +224,8 @@ public class Sequence implements Comparable<Sequence> {
 
     //calculates the aim time of the sequence based on the start of the stot-the end of the draw
     private void calculateAimTime() {
-        int startOfAim = TemplateStore.instance.patternMatchers[1].lengthOfTemplate;//the starting of our aim is at the end of the template
-        int endOfAim   = sequenceData[0].getSamples().size() - TemplateStore.releaseRecordTime;//get the end minus the extra data  added to the end
+        int startOfAim = FeatureSelectorStore.instance.eventSearchers[1].lengthOfTemplate;//the starting of our aim is at the end of the template
+        int endOfAim   = sequenceData[0].getSamples().size() - FeatureSelectorStore.releaseRecordTime;//get the end minus the extra data  added to the end
 
         aimTime = endOfAim - startOfAim;
     }
@@ -235,7 +235,7 @@ public class Sequence implements Comparable<Sequence> {
     public void zeroAimPadding(int index) {
         int sizeOfSet    = sequenceData[index].getSamples().size();
         int lengthToAdd  = desiredLength - (sizeOfSet);
-        int paddingIndex = sizeOfSet - (TemplateStore.releaseRecordTime + 10);
+        int paddingIndex = sizeOfSet - (FeatureSelectorStore.releaseRecordTime + 10);
         if (paddingIndex <= 0) {
             paddingIndex = 0;
         }

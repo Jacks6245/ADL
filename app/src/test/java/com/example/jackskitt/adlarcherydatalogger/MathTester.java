@@ -14,10 +14,6 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by Jack Skitt on 30/04/2017.
- */
-
 public class MathTester {
     double[] test   = new double[]{4, 3, 1, 2, 4, 5, 6};
     double[] correl = new double[]{1, 2, 4, 5, 2, 1, 3};

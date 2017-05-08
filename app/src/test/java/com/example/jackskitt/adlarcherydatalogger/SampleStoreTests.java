@@ -11,10 +11,6 @@ import org.junit.Test;
 import java.util.Collections;
 
 
-/**
- * Created by Jack Skitt on 30/04/2017.
- */
-
 public class SampleStoreTests {
     SampleStorage a    = new SampleStorage();
     Sample[]      test = new Sample[]{new Sample(0, 0, 0, 0, 0, 0, 0, 0, 0, true),
